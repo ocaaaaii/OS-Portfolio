@@ -1,0 +1,49 @@
+'use client'
+import { useState, useEffect } from 'react'
+
+export default function TopBar() {
+  const [time, setTime] = useState('')
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date()
+      setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }))
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div
+      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 py-2"
+      style={{
+        background: 'rgba(226,213,197,0.80)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(106,152,150,0.20)',
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--teal-dark)' }}>
+          CA&apos;s OS
+        </span>
+        <span className="text-[10px] px-2 py-0.5 rounded-full"
+          style={{ background: 'rgba(106,152,150,0.20)', color: 'var(--teal)' }}>
+          v1.0.0
+        </span>
+      </div>
+
+      <div className="flex items-center gap-5">
+        {['Projects', 'Skills', 'Experience', 'Contact'].map(label => (
+          <span key={label} className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+            {label}
+          </span>
+        ))}
+      </div>
+
+      <span className="text-xs font-semibold tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+        {time}
+      </span>
+    </div>
+  )
+}
