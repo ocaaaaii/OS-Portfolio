@@ -19,7 +19,7 @@ export const PROJECT_APPS: AppConfig[] = [
     emoji: 'M',
     bg: '#8AAEAB',
     imgSrc: '/Mochi.png',
-    iconScale: 1.2,
+    iconScale: 1.0,
     iframeUrl: 'https://mochiselfgrowingapp.vercel.app/home',
   },
   {
@@ -39,7 +39,7 @@ export const PROJECT_APPS: AppConfig[] = [
     emoji: 'T',
     bg: '#4A7070',
     imgSrc: '/Tipsplit.png',
-    iconScale: 1.2,
+    iconScale: 1.0,
     iframeUrl: 'https://tip-split-usa.vercel.app/',
   },
 ]
