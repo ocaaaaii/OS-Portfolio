@@ -14,44 +14,54 @@ export default function ReadmeContent() {
 
       <section>
         <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
-          About Me
+          About This Project
         </h3>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          Hi! I&#39;m <strong style={{ color: 'var(--text-primary)' }}>Joanne Wu (吳蕎安)</strong> — a High-achieving Information Management MS
-          (GPA 3.98) with full-stack development experience at{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>TSMC</strong> and advanced AI training at{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>ITRI</strong>.
-          Proven track record of bridging business-tech gaps and managing 200+ participant field experiments.
-          Seeking a Software Engineer or Technical PM role to deliver scalable, user-centric enterprise solutions.
+          A browser-based <strong style={{ color: 'var(--text-primary)' }}>OS-style personal portfolio</strong> inspired by the desktop UI metaphor.
+          Instead of a traditional scrolling page, everything lives inside an interactive desktop —
+          widgets, draggable windows, a working terminal, and project showcases via iframe.
         </p>
       </section>
 
       <section>
         <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
-          Thesis
+          Tech Stack
         </h3>
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          Research on the <em>Impact of Generative AI Conversational Systems on Elderly Well-being</em>.
-          Orchestrated a 3-month field experiment partnering with 7 community centers and 200+ elderly participants
-          for a 3-week technology trial — proving GenAI&#39;s significant positive impact on emotional well-being.
-        </p>
-      </section>
-
-      <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
-          Fun Facts
-        </h3>
-        <ul className="text-sm space-y-1.5" style={{ color: 'var(--text-secondary)' }}>
-          <li>&#9749;&#65039;  Coffee and protein are non-negotiable — so are side-projects</li>
-          <li>&#9992;&#65039;  3 months immersion study in San Francisco — TOEIC 800, CEFR B2+ / pre-advanced</li>
-          <li>&#127925;  Music + dancing are my reset between coding sessions</li>
-          <li>&#127758;  English (Fluent) &#183; Mandarin (Native) &#183; Japanese (Conversational)</li>
-          <li>&#129302;  Currently deep in AI / ML / DL / Image Processing at ITRI</li>
+        <ul className="text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Next.js 14</strong> — App Router, SPA architecture</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Tailwind CSS</strong> — utility-first styling</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>React Context</strong> — window manager (open / minimize / focus / drag)</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Lucide React</strong> — icons</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Vercel</strong> — deployment</li>
         </ul>
       </section>
 
+      <section>
+        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+          Features
+        </h3>
+        <ul className="text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
+          <li>&#128187;  Desktop widgets — Profile, Skills, Experience</li>
+          <li>&#128450;&#65039;  readme.txt — this window you&#39;re reading right now</li>
+          <li>&#62;&#95;  Terminal — type <code style={{ color: 'var(--accent-terra)' }}>help</code> to explore</li>
+          <li>&#64;  Contact — email, phone, LinkedIn, GitHub</li>
+          <li>&#128218;  Project apps — live iframes of deployed side projects</li>
+          <li>&#10010;  Custom app creator — add your own apps via localStorage</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+          Design
+        </h3>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          Morandi Sage &amp; Terracotta palette — soft cream tones, frosted glass (backdrop-blur) dock,
+          squircle app icons, and smooth window animations. Built to feel premium without being loud.
+        </p>
+      </section>
+
       <p className="text-xs italic pt-2" style={{ color: 'var(--text-muted)' }}>
-        — Open to Software Engineer &amp; Technical PM roles —
+        — Designed &amp; built by Joanne Wu —
       </p>
     </div>
   )
