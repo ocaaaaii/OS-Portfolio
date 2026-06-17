@@ -19,7 +19,7 @@ export const PROJECT_APPS: AppConfig[] = [
     emoji: 'M',
     bg: '#8AAEAB',
     imgSrc: '/Mochi.png',
-    iconScale: 2.0,
+    iconScale: 1.2,
     iframeUrl: 'https://mochiselfgrowingapp.vercel.app/home',
   },
   {
