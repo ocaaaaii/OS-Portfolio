@@ -68,6 +68,13 @@ export const SYSTEM_APPS: AppConfig[] = [
     emoji: '@',
     bg: '#9B84C4',
   },
+  {
+    id: 'vibecoding',
+    type: 'vibecoding',
+    label: 'Vibe Coding',
+    emoji: 'SOP',
+    bg: '#7B6FA0',
+  },
 ]
 
 export const ALL_APPS = [...PROJECT_APPS, ...SYSTEM_APPS]

@@ -6,6 +6,7 @@ import { useIsMobile } from '@/hooks/useIsMobile'
 import Terminal from './Terminal'
 import ReadmeContent from './ReadmeContent'
 import ContactContent from './ContactContent'
+import VibeCodingContent from './VibeCodingContent'
 
 interface Props { win: WindowInstance }
 
@@ -40,6 +41,8 @@ export default function WindowModal({ win }: Props) {
     content = <ReadmeContent />
   } else if (win.type === 'contact') {
     content = <ContactContent />
+  } else if (win.type === 'vibecoding') {
+    content = <VibeCodingContent />
   } else if (win.type === 'project' && win.iframeUrl) {
     if (win.previewImg) {
       content = (

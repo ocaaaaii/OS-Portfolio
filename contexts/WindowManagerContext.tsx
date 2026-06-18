@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useContext, useReducer, ReactNode } from 'react'
 
-export type WindowType = 'readme' | 'terminal' | 'project' | 'contact'
+export type WindowType = 'readme' | 'terminal' | 'project' | 'contact' | 'vibecoding'
 
 export interface WindowInstance {
   id: string
@@ -30,7 +30,8 @@ type Action =
   | { type: 'MOVE_WINDOW'; payload: { id: string; position: { x: number; y: number } } }
 
 const DEFAULT_SIZES: Record<WindowType, { width: number; height: number }> = {
-  readme:   { width: 560, height: 460 },
+  readme:      { width: 560, height: 460 },
+  vibecoding:  { width: 680, height: 580 },
   terminal: { width: 660, height: 420 },
   project:  { width: 920, height: 620 },
   contact:  { width: 500, height: 440 },
