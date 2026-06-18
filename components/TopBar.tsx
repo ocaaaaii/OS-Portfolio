@@ -33,7 +33,7 @@ export default function TopBar() {
         </span>
       </div>
 
-      <div className="flex items-center gap-5">
+      <div className="hidden md:flex items-center gap-5">
         {['Projects', 'Skills', 'Experience', 'Contact'].map(label => (
           <span key={label} className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
             {label}

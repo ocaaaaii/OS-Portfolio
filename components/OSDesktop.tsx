@@ -30,10 +30,10 @@ function Desktop() {
         className="absolute inset-0 overflow-y-auto overflow-x-hidden"
         style={{ paddingTop: '40px', paddingBottom: '140px' }}
       >
-        <div className="max-w-5xl mx-auto px-6 py-6 space-y-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-8">
 
           {/* ── Top widgets row ── */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <ProfileWidget />
             <SkillsWidget />
             <ExperienceWidget />
@@ -42,7 +42,7 @@ function Desktop() {
           {/* ── Projects section ── */}
           <div>
             <SectionLabel>Projects</SectionLabel>
-            <div className="flex gap-8 flex-wrap">
+            <div className="flex gap-6 sm:gap-8 flex-wrap">
               {PROJECT_APPS.map(app => (
                 <AppIcon key={app.id} app={app} />
               ))}
@@ -52,7 +52,7 @@ function Desktop() {
           {/* ── About Me section ── */}
           <div>
             <SectionLabel>About Me</SectionLabel>
-            <div className="flex gap-8 flex-wrap">
+            <div className="flex gap-6 sm:gap-8 flex-wrap">
               {SYSTEM_APPS.map(app => (
                 <AppIcon key={app.id} app={app} />
               ))}

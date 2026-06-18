@@ -8,19 +8,22 @@ export default function Dock() {
   const minimized = windows.filter(w => w.isMinimized)
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-      <div className="glass rounded-2xl px-5 py-3 flex items-end gap-4"
-        style={{ boxShadow: '0 8px 32px rgba(42,62,62,0.18)' }}>
+    <div className="fixed bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50"
+      style={{ maxWidth: 'calc(100vw - 24px)' }}>
+      <div
+        className="glass rounded-2xl px-3 sm:px-5 py-2 sm:py-3 flex items-end gap-2 sm:gap-4 overflow-x-auto"
+        style={{ boxShadow: '0 8px 32px rgba(42,62,62,0.18)', scrollbarWidth: 'none' }}
+      >
         {ALL_APPS.map(app => <AppIcon key={app.id} app={app} size="sm" />)}
         {minimized.length > 0 && (
-          <div className="w-px h-10 rounded-full mx-1" style={{ background: 'var(--glass-border)' }} />
+          <div className="w-px h-10 rounded-full mx-1 shrink-0" style={{ background: 'var(--glass-border)' }} />
         )}
         {minimized.map(win => {
           const app = ALL_APPS.find(a => a.id === win.id)
           return (
             <button key={win.id} onClick={() => restoreWindow(win.id)}
-              className="flex flex-col items-center gap-1 group" title={win.title}>
-              <div className="w-12 h-12 squircle overflow-hidden flex items-center justify-center shadow-md
+              className="flex flex-col items-center gap-1 group shrink-0" title={win.title}>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 squircle overflow-hidden flex items-center justify-center shadow-md
                 transition-transform duration-150 group-hover:scale-110 opacity-70 group-hover:opacity-100"
                 style={{ backgroundColor: app?.bg ?? '#6A9896' }}>
                 {app?.imgSrc ? (

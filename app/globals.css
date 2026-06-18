@@ -52,4 +52,10 @@ body {
 }
 .window-in { animation: windowIn 0.22s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.slide-up { animation: slideUp 0.30s cubic-bezier(0.34,1.2,0.64,1) forwards; }
+
 ::selection { background: rgba(132,156,146,0.30); }
