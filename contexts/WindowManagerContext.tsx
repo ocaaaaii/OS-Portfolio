@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useContext, useReducer, ReactNode } from 'react'
 
-export type WindowType = 'readme' | 'terminal' | 'project' | 'contact' | 'vibecoding' | 'gallery'
+export type WindowType = 'readme' | 'terminal' | 'project' | 'contact' | 'vibecoding' | 'gallery' | 'note'
 
 export interface WindowInstance {
   id: string
@@ -33,9 +33,10 @@ const DEFAULT_SIZES: Record<WindowType, { width: number; height: number }> = {
   readme:      { width: 560, height: 460 },
   vibecoding:  { width: 680, height: 580 },
   gallery:     { width: 860, height: 620 },
-  terminal: { width: 660, height: 420 },
-  project:  { width: 920, height: 620 },
-  contact:  { width: 500, height: 440 },
+  note:        { width: 700, height: 540 },
+  terminal:    { width: 660, height: 420 },
+  project:     { width: 920, height: 620 },
+  contact:     { width: 500, height: 440 },
 }
 
 function getDefaultPosition(index: number) {

@@ -69,13 +69,6 @@ export const SYSTEM_APPS: AppConfig[] = [
     bg: '#9B84C4',
   },
   {
-    id: 'vibecoding',
-    type: 'vibecoding',
-    label: 'Vibe Coding',
-    emoji: 'SOP',
-    bg: '#7B6FA0',
-  },
-  {
     id: 'gallery',
     type: 'gallery',
     label: 'Gallery',
@@ -84,4 +77,15 @@ export const SYSTEM_APPS: AppConfig[] = [
   },
 ]
 
-export const ALL_APPS = [...PROJECT_APPS, ...SYSTEM_APPS]
+// NOTE section system apps
+export const NOTE_SYSTEM_APPS: AppConfig[] = [
+  {
+    id: 'vibecoding',
+    type: 'vibecoding',
+    label: 'Vibe Coding',
+    emoji: 'SOP',
+    bg: '#7B6FA0',
+  },
+]
+
+export const ALL_APPS = [...PROJECT_APPS, ...SYSTEM_APPS, ...NOTE_SYSTEM_APPS]
