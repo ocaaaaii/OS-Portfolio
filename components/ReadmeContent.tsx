@@ -36,7 +36,7 @@ export default function ReadmeContent() {
           <li>&#127915;  Music &amp; dancing are my reset between coding sessions</li>
           <li>&#127828;  Obsessed with picnics — good food, good view, good vibes</li>
           <li>&#9992;&#65039;  Love traveling — always planning the next trip</li>
-          <li>&#129302;  Currently deep in ML / DL / Image Processing at ITRI</li>
+          <li>&#129302;  Currently deep in AI / ML / DL / Image Processing at ITRI</li>
           <li>&#129504;  MBTI: INTJ-A</li>
         </ul>
       </section>
