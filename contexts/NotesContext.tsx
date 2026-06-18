@@ -122,13 +122,15 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) {
-        setNotes(JSON.parse(saved))
+      const parsed: Note[] = saved ? JSON.parse(saved) : []
+      // Seed the initial ML note if it's not already present
+      const hasInitial = parsed.some(n => n.id === INITIAL_NOTE.id)
+      if (!hasInitial) {
+        const seeded = [INITIAL_NOTE, ...parsed]
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded))
+        setNotes(seeded)
       } else {
-        // Seed with initial note on first load
-        const initial = [INITIAL_NOTE]
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial))
-        setNotes(initial)
+        setNotes(parsed)
       }
     } catch {
       setNotes([INITIAL_NOTE])
