@@ -39,6 +39,20 @@ export default function ReadmeContent() {
 
       <section>
         <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+          Fun Facts
+        </h3>
+        <ul className="text-sm space-y-1.5" style={{ color: 'var(--text-secondary)' }}>
+          <li>&#9749;&#65039;  Coffee &amp; protein are non-negotiable — so are side-projects</li>
+          <li>&#9992;&#65039;  3 months immersion in San Francisco — English fluent (pre-Advanced), conversational Japanese &amp; still learning</li>
+          <li>&#127915;  Music &amp; dancing are my reset between coding sessions</li>
+          <li>&#127828;  Obsessed with picnics — good food, good view, good vibes</li>
+          <li>&#129302;  Currently deep in ML / DL / Image Processing at ITRI</li>
+          <li>&#129504;  MBTI: INTJ</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
           Tech Stack
         </h3>
         <ul className="text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
