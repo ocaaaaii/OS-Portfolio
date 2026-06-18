@@ -2,6 +2,74 @@
 import { useState, useRef } from 'react'
 import { useGallery, GalleryPhoto } from '@/contexts/GalleryContext'
 
+// ── Delete Confirm Modal ──────────────────────────────────────────────────────
+function DeletePhotoConfirm({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  const [pw, setPw] = useState('')
+  const [err, setErr] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const hash = await hashInput(pw)
+    if (hash === (process.env.NEXT_PUBLIC_ADD_PROJECT_HASH ?? '')) {
+      onConfirm()
+    } else {
+      setErr(true)
+      setPw('')
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[350] flex items-center justify-center"
+      style={{ background: 'rgba(10,8,8,0.65)', backdropFilter: 'blur(6px)' }}
+      onClick={e => { if (e.target === e.currentTarget) onCancel() }}>
+      <div className="rounded-2xl w-72 overflow-hidden shadow-2xl"
+        style={{ background: 'rgba(242,237,231,0.97)', border: '1px solid rgba(132,156,146,0.28)' }}>
+        {/* Title bar */}
+        <div className="flex items-center gap-3 px-4 py-3"
+          style={{ background: 'rgba(226,213,197,0.92)', borderBottom: '1px solid rgba(132,156,146,0.20)' }}>
+          <div className="flex gap-1.5">
+            <button onClick={onCancel} className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+            <div className="w-3 h-3 rounded-full bg-[#FEBC2E] opacity-40" />
+            <div className="w-3 h-3 rounded-full bg-[#28C840] opacity-40" />
+          </div>
+          <span className="flex-1 text-center text-xs font-semibold" style={{ color: '#5C4E4E' }}>
+            Delete Photo
+          </span>
+          <div className="w-[52px]" />
+        </div>
+        <div className="p-5">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                style={{ background: 'rgba(200,80,60,0.10)', border: '1px solid rgba(132,156,146,0.28)' }}>🗑️</div>
+              <p className="text-xs text-center" style={{ color: '#8A7A7A' }}>
+                Enter password to delete this photo
+              </p>
+            </div>
+            <input type="password" value={pw} onChange={e => { setPw(e.target.value); setErr(false) }}
+              placeholder="Password" autoFocus
+              className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+              style={{ background: 'rgba(132,156,146,0.10)', border: `1px solid ${err ? '#C4845A' : 'rgba(132,156,146,0.28)'}`, color: '#3A3030' }} />
+            {err && <p className="text-xs text-center" style={{ color: '#C4845A' }}>Incorrect password.</p>}
+            <div className="flex gap-2">
+              <button type="button" onClick={onCancel}
+                className="flex-1 py-2 rounded-xl text-xs font-semibold hover:opacity-75 transition-opacity"
+                style={{ background: 'rgba(132,156,146,0.15)', color: '#5C4E4E', border: '1px solid rgba(132,156,146,0.28)' }}>
+                Cancel
+              </button>
+              <button type="submit"
+                className="flex-1 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity"
+                style={{ background: 'rgba(200,80,60,0.75)', color: '#fff' }}>
+                Delete
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 async function hashInput(input: string): Promise<string> {
   const encoded = new TextEncoder().encode(input)
   const buf = await crypto.subtle.digest('SHA-256', encoded)
@@ -188,6 +256,7 @@ export default function GalleryContent() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
   const [showAdd, setShowAdd] = useState(false)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
 
   return (
     <div className="h-full flex flex-col" style={{ background: '#16141A' }}>
@@ -249,7 +318,7 @@ export default function GalleryContent() {
                   )}
                   {!photo.isStatic && (
                     <button
-                      onClick={e => { e.stopPropagation(); removePhoto(photo.id) }}
+                      onClick={e => { e.stopPropagation(); setDeleteTargetId(photo.id) }}
                       className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs transition-opacity hover:opacity-100 opacity-70"
                       style={{ background: 'rgba(200,80,60,0.75)', color: '#fff' }}>
                       ✕
@@ -274,6 +343,14 @@ export default function GalleryContent() {
 
       {/* Add Photo Modal */}
       {showAdd && <AddPhotoModal onClose={() => setShowAdd(false)} />}
+
+      {/* Delete confirm */}
+      {deleteTargetId && (
+        <DeletePhotoConfirm
+          onConfirm={() => { removePhoto(deleteTargetId); setDeleteTargetId(null) }}
+          onCancel={() => setDeleteTargetId(null)}
+        />
+      )}
     </div>
   )
 }
