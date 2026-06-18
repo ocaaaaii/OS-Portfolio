@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useCallback, ReactNode } from 'react'
+import { useRef, useCallback, useEffect, ReactNode } from 'react'
 import { WindowInstance } from '@/contexts/WindowManagerContext'
 import { useWindowManager } from '@/contexts/WindowManagerContext'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -15,6 +15,13 @@ export default function WindowModal({ win }: Props) {
   const { closeWindow, minimizeWindow, focusWindow, moveWindow } = useWindowManager()
   const isMobile = useIsMobile(1024)
   const dragOffset = useRef<{ dx: number; dy: number } | null>(null)
+
+  // Lock body scroll on mobile when modal is open
+  useEffect(() => {
+    if (!isMobile || win.isMinimized) return
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [isMobile, win.isMinimized])
 
   const onTitleMouseDown = useCallback((e: React.MouseEvent) => {
     if (isMobile) return
@@ -135,11 +142,15 @@ export default function WindowModal({ win }: Props) {
         <div
           className="relative mt-auto rounded-t-2xl overflow-hidden flex flex-col"
           style={{
-            height: '92dvh',
+            height: '93dvh',
             background: 'rgba(242,237,231,0.97)',
             boxShadow: '0 -8px 40px rgba(42,62,62,0.22)',
           }}
         >
+          {/* drag handle */}
+          <div className="flex justify-center pt-2 pb-0 shrink-0">
+            <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(132,156,146,0.35)' }} />
+          </div>
           {titleBar}
           <div className="flex-1 overflow-hidden">
             {content}

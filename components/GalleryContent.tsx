@@ -219,7 +219,7 @@ export default function GalleryContent() {
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto p-4">
-          <div style={{ columns: '2 180px', columnGap: '12px' }}>
+          <div style={{ columns: '3 120px', columnGap: '10px' }}>
             {photos.map((photo, idx) => (
               <div
                 key={photo.id}

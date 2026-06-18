@@ -51,12 +51,12 @@ export default function TopBar() {
         </span>
       </div>
 
-      <div className="hidden md:flex items-center gap-1">
+      <div className="flex items-center gap-0.5 sm:gap-1">
         {navItems.map(({ label, action }) => (
           <button
             key={label}
             onClick={action}
-            className="text-xs font-medium px-3 py-1 rounded-lg transition-all hover:opacity-100 opacity-70"
+            className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 rounded-lg transition-all hover:opacity-100 opacity-70"
             style={{
               color: 'var(--text-secondary)',
               background: 'transparent',

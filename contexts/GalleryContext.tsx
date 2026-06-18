@@ -34,11 +34,12 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetch('/api/gallery')
       .then(r => r.json())
-      .then((items: { src: string }[]) => {
+      .then((items: { src: string; description?: string }[]) => {
         setStaticPhotos(
           items.map((item, i) => ({
             id: `static-${i}-${item.src}`,
             src: item.src,
+            description: item.description,
             isStatic: true,
           }))
         )
