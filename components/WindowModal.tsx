@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useCallback, useEffect, ReactNode } from 'react'
+import { useRef, useCallback, useEffect, useState, ReactNode } from 'react'
 import { WindowInstance } from '@/contexts/WindowManagerContext'
 import { useWindowManager } from '@/contexts/WindowManagerContext'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -16,6 +16,7 @@ export default function WindowModal({ win }: Props) {
   const { closeWindow, minimizeWindow, focusWindow, moveWindow } = useWindowManager()
   const isMobile = useIsMobile(1024)
   const dragOffset = useRef<{ dx: number; dy: number } | null>(null)
+  const [isMaximized, setIsMaximized] = useState(false)
 
   // Lock body scroll on mobile when modal is open
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function WindowModal({ win }: Props) {
   }, [isMobile, win.isMinimized])
 
   const onTitleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (isMobile) return
+    if (isMobile || isMaximized) return
     if ((e.target as HTMLElement).closest('button')) return
     e.preventDefault()
     focusWindow(win.id)
@@ -41,7 +42,7 @@ export default function WindowModal({ win }: Props) {
     }
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
-  }, [win.id, win.position, focusWindow, moveWindow, isMobile])
+  }, [win.id, win.position, focusWindow, moveWindow, isMobile, isMaximized])
 
   let content: ReactNode
   if (win.type === 'terminal') {
@@ -108,7 +109,7 @@ export default function WindowModal({ win }: Props) {
   /* ── Title bar (shared) ── */
   const titleBar = (
     <div
-      className={`flex items-center gap-3 px-4 py-3 shrink-0 ${isMobile ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+      className={`flex items-center gap-3 px-4 py-3 shrink-0 ${(isMobile || isMaximized) ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       style={{ background: 'rgba(226,213,197,0.92)', borderBottom: '1px solid var(--glass-border)' }}
       onMouseDown={onTitleMouseDown}
     >
@@ -117,7 +118,11 @@ export default function WindowModal({ win }: Props) {
           className="w-3 h-3 rounded-full bg-[#FF5F57] hover:bg-[#e74c3c] transition-colors" />
         <button onClick={() => minimizeWindow(win.id)}
           className="w-3 h-3 rounded-full bg-[#FEBC2E] hover:bg-[#f39c12] transition-colors" />
-        <button className="w-3 h-3 rounded-full bg-[#28C840] hover:bg-[#27ae60] transition-colors" />
+        <button
+          onClick={() => setIsMaximized(v => !v)}
+          className="w-3 h-3 rounded-full bg-[#28C840] hover:bg-[#27ae60] transition-colors"
+          title={isMaximized ? 'Restore' : 'Maximize'}
+        />
       </div>
       <span className="flex-1 text-center text-xs font-semibold tracking-wide truncate"
         style={{ color: 'var(--text-secondary)' }}>
@@ -163,21 +168,34 @@ export default function WindowModal({ win }: Props) {
     )
   }
 
-  /* ── Desktop: draggable window ── */
+  /* ── Desktop: draggable / maximizable window ── */
+  const maximizedStyle = {
+    left: 0, top: 40,
+    width: '100vw',
+    height: 'calc(100vh - 40px)',
+    zIndex: win.zIndex,
+  }
+  const normalStyle = {
+    left: win.position.x, top: win.position.y,
+    width: win.size.width, height: win.size.height,
+    zIndex: win.zIndex,
+    maxWidth: 'calc(100vw - 40px)',
+    maxHeight: 'calc(100vh - 100px)',
+  }
+
   return (
     <div
-      className="fixed window-in select-none"
-      style={{
-        left: win.position.x, top: win.position.y,
-        width: win.size.width, height: win.size.height,
-        zIndex: win.zIndex,
-        maxWidth: 'calc(100vw - 40px)',
-        maxHeight: 'calc(100vh - 100px)',
-      }}
+      className={`fixed select-none ${isMaximized ? '' : 'window-in'}`}
+      style={isMaximized ? maximizedStyle : normalStyle}
       onMouseDown={() => focusWindow(win.id)}
     >
-      <div className="glass rounded-xl overflow-hidden flex flex-col h-full"
-        style={{ boxShadow: '0 20px 48px rgba(42,62,62,0.22), 0 2px 8px rgba(42,62,62,0.10)' }}>
+      <div
+        className={`glass flex flex-col h-full ${isMaximized ? 'rounded-none' : 'rounded-xl'}`}
+        style={{
+          boxShadow: isMaximized ? 'none' : '0 20px 48px rgba(42,62,62,0.22), 0 2px 8px rgba(42,62,62,0.10)',
+          transition: 'border-radius 0.18s ease',
+        }}
+      >
         {titleBar}
         <div className="flex-1 overflow-hidden" style={{ background: 'rgba(242,237,231,0.94)' }}>
           {content}
