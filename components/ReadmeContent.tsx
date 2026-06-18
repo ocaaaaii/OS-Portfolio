@@ -25,6 +25,20 @@ export default function ReadmeContent() {
 
       <section>
         <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+          About CA
+        </h3>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          Hi! I&#39;m <strong style={{ color: 'var(--text-primary)' }}>Joanne Wu (吳蕎安)</strong> — a Software Engineer & Technical PM
+          with an MS in Information Management (GPA 3.98) from NSYSU.
+          I&#39;ve built full-stack platforms at <strong style={{ color: 'var(--text-primary)' }}>TSMC</strong>,
+          conducted AI research at <strong style={{ color: 'var(--text-primary)' }}>ITRI</strong>,
+          and ship side projects in my spare time.
+          Currently seeking roles where I can bridge technology and people.
+        </p>
+      </section>
+
+      <section>
+        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
           Tech Stack
         </h3>
         <ul className="text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
