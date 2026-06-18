@@ -8,10 +8,6 @@ export interface GalleryPhoto {
   isStatic?: boolean   // pre-configured, not deletable
 }
 
-// ── Pre-configured public photos ─────────────────────────────────────────────
-// Add your public/ photo filenames here, e.g. { src: '/photos/picnic.jpg', description: 'Afternoon picnic ☀️' }
-export const STATIC_PHOTOS: GalleryPhoto[] = []
-
 const STORAGE_KEY = 'ca-gallery-photos'
 
 interface CtxValue {
@@ -24,12 +20,30 @@ const Ctx = createContext<CtxValue>({ photos: [], addPhoto: () => {}, removePhot
 
 export function GalleryProvider({ children }: { children: ReactNode }) {
   const [dynamic, setDynamic] = useState<GalleryPhoto[]>([])
+  const [staticPhotos, setStaticPhotos] = useState<GalleryPhoto[]>([])
 
+  // Load user-uploaded photos from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) setDynamic(JSON.parse(saved))
     } catch {}
+  }, [])
+
+  // Fetch numbered photos from public/ via API
+  useEffect(() => {
+    fetch('/api/gallery')
+      .then(r => r.json())
+      .then((items: { src: string }[]) => {
+        setStaticPhotos(
+          items.map((item, i) => ({
+            id: `static-${i}-${item.src}`,
+            src: item.src,
+            isStatic: true,
+          }))
+        )
+      })
+      .catch(() => {})
   }, [])
 
   function addPhoto(p: Omit<GalleryPhoto, 'id' | 'isStatic'>) {
@@ -49,7 +63,7 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const photos = [...dynamic, ...STATIC_PHOTOS]
+  const photos = [...dynamic, ...staticPhotos]
 
   return (
     <Ctx.Provider value={{ photos, addPhoto, removePhoto }}>
