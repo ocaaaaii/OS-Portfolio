@@ -1,12 +1,14 @@
 'use client'
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { useCustomProjects } from '@/contexts/CustomProjectsContext'
+import { useNotes } from '@/contexts/NotesContext'
 
 const HELP_TEXT = `Available commands:
   help        show this list
   whoami      about Joanne
   skills      tech stack
   projects    side projects
+  notes       learning notes
   experience  work history
   contact     get in touch
   clear       clear terminal`
@@ -52,6 +54,7 @@ type Line = { text: string; isCmd?: boolean }
 
 export default function Terminal() {
   const { customProjects } = useCustomProjects()
+  const { notes } = useNotes()
   const [lines, setLines] = useState<Line[]>([
     { text: 'Joanne OS Terminal v1.0.0' },
     { text: 'Type "help" to see available commands.' },
@@ -89,6 +92,17 @@ export default function Terminal() {
             ).join('\n')
           : ''
         push(PROJECTS_TEXT + extra)
+        break
+      }
+      case 'notes': {
+        if (notes.length === 0) {
+          push('No notes yet. Click "+" in the NOTE section to add one.')
+        } else {
+          const notesList = notes.map((n, i) =>
+            `[${i + 1}] ${n.title}\n     ${new Date(n.createdAt).toLocaleDateString('zh-TW')}`
+          ).join('\n')
+          push(`Learning Notes (${notes.length}):\n${notesList}`)
+        }
         break
       }
       case 'experience': push(EXPERIENCE_TEXT); break

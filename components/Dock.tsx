@@ -1,7 +1,9 @@
 'use client'
 import { useWindowManager } from '@/contexts/WindowManagerContext'
 import { useCustomProjects } from '@/contexts/CustomProjectsContext'
-import { ALL_APPS } from '@/data/appConfig'
+import { PROJECT_APPS, SYSTEM_APPS } from '@/data/appConfig'
+
+const DOCK_APPS = [...PROJECT_APPS, ...SYSTEM_APPS]
 import AppIcon from './AppIcon'
 
 export default function Dock() {
@@ -16,7 +18,7 @@ export default function Dock() {
         className="glass rounded-2xl px-3 sm:px-5 py-2 sm:py-3 flex items-end gap-2 sm:gap-4 overflow-x-auto"
         style={{ boxShadow: '0 8px 32px rgba(42,62,62,0.18)', scrollbarWidth: 'none' }}
       >
-        {ALL_APPS.map(app => <AppIcon key={app.id} app={app} size="sm" />)}
+        {DOCK_APPS.map(app => <AppIcon key={app.id} app={app} size="sm" />)}
 
         {/* Custom project icons in dock */}
         {customProjects.map(p => (
@@ -42,7 +44,7 @@ export default function Dock() {
           <div className="w-px h-10 rounded-full mx-1 shrink-0" style={{ background: 'var(--glass-border)' }} />
         )}
         {minimized.map(win => {
-          const app = ALL_APPS.find(a => a.id === win.id)
+          const app = DOCK_APPS.find(a => a.id === win.id)
           const custom = customProjects.find(p => p.id === win.id)
           const bg = app?.bg ?? custom?.bg ?? '#6A9896'
           const imgSrc = app?.imgSrc ?? custom?.logoDataUrl
