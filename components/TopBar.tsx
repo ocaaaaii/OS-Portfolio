@@ -1,8 +1,19 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useWindowManager } from '@/contexts/WindowManagerContext'
+
+function scrollToSection(sectionId: string) {
+  const container = document.getElementById('desktop-scroll')
+  const target = document.getElementById(sectionId)
+  if (container && target) {
+    container.scrollTo({ top: target.offsetTop - 16, behavior: 'smooth' })
+  }
+}
 
 export default function TopBar() {
   const [time, setTime] = useState('')
+  const { openWindow } = useWindowManager()
+
   useEffect(() => {
     const tick = () => {
       const now = new Date()
@@ -12,6 +23,13 @@ export default function TopBar() {
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [])
+
+  const navItems: { label: string; action: () => void }[] = [
+    { label: 'Projects',   action: () => scrollToSection('section-projects') },
+    { label: 'Skills',     action: () => scrollToSection('section-widgets') },
+    { label: 'Experience', action: () => scrollToSection('section-widgets') },
+    { label: 'Contact',    action: () => openWindow({ id: 'contact', type: 'contact', title: 'Contact Me' }) },
+  ]
 
   return (
     <div
@@ -33,11 +51,21 @@ export default function TopBar() {
         </span>
       </div>
 
-      <div className="hidden md:flex items-center gap-5">
-        {['Projects', 'Skills', 'Experience', 'Contact'].map(label => (
-          <span key={label} className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+      <div className="hidden md:flex items-center gap-1">
+        {navItems.map(({ label, action }) => (
+          <button
+            key={label}
+            onClick={action}
+            className="text-xs font-medium px-3 py-1 rounded-lg transition-all hover:opacity-100 opacity-70"
+            style={{
+              color: 'var(--text-secondary)',
+              background: 'transparent',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(132,156,146,0.15)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+          >
             {label}
-          </span>
+          </button>
         ))}
       </div>
 

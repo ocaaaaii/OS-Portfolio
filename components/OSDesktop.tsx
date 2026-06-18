@@ -59,20 +59,21 @@ function Desktop() {
     <div className="relative w-full h-full">
       {/* Scrollable desktop area */}
       <div
+        id="desktop-scroll"
         className="absolute inset-0 overflow-y-auto overflow-x-hidden"
         style={{ paddingTop: '40px', paddingBottom: '140px' }}
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-8">
 
           {/* ── Top widgets row ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div id="section-widgets" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <ProfileWidget />
             <SkillsWidget />
             <ExperienceWidget />
           </div>
 
           {/* ── Projects section ── */}
-          <div>
+          <div id="section-projects">
             <div className="flex items-center gap-3 mb-3 px-1">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em]"
                 style={{ color: 'var(--text-muted)' }}>
