@@ -9,6 +9,7 @@ export interface AppConfig {
   imgSrc?: string
   iconScale?: number
   iframeUrl?: string
+  previewImg?: string
 }
 
 export const PROJECT_APPS: AppConfig[] = [
@@ -31,6 +32,7 @@ export const PROJECT_APPS: AppConfig[] = [
     imgSrc: '/Stock.png',
     iconScale: 1.0,
     iframeUrl: 'https://stockplatform-rp6tf42ln2k8qfcztevgvy.streamlit.app/',
+    previewImg: '/stock-preview.png',
   },
   {
     id: 'project-tip',

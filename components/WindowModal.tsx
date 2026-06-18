@@ -41,16 +41,50 @@ export default function WindowModal({ win }: Props) {
   } else if (win.type === 'contact') {
     content = <ContactContent />
   } else if (win.type === 'project' && win.iframeUrl) {
-    content = (
-      <div className="relative h-full w-full">
-        <iframe src={win.iframeUrl} className="w-full h-full border-0" title={win.title}
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" />
-        <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full text-[10px] pointer-events-none opacity-50"
-          style={{ background: 'rgba(42,62,62,0.75)', color: '#F2EDE7' }}>
-          {win.iframeUrl}
+    if (win.previewImg) {
+      content = (
+        <div className="relative h-full w-full flex flex-col items-center justify-center overflow-hidden"
+          style={{ background: '#1A1A1A' }}>
+          {/* screenshot */}
+          <img
+            src={win.previewImg}
+            alt={`${win.title} preview`}
+            className="w-full h-full object-contain"
+          />
+          {/* overlay gradient + button */}
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-8"
+            style={{ background: 'linear-gradient(to top, rgba(20,20,20,0.85) 0%, transparent 50%)' }}>
+            <p className="text-xs mb-3 opacity-60" style={{ color: '#E8DDD0' }}>
+              Preview — live embed not available
+            </p>
+            <a
+              href={win.iframeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-85"
+              style={{ background: 'var(--teal)', color: '#fff' }}
+            >
+              Open {win.title}
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </div>
         </div>
-      </div>
-    )
+      )
+    } else {
+      content = (
+        <div className="relative h-full w-full">
+          <iframe src={win.iframeUrl} className="w-full h-full border-0" title={win.title}
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" />
+          <div className="absolute bottom-3 right-3 px-3 py-1 rounded-full text-[10px] pointer-events-none opacity-50"
+            style={{ background: 'rgba(42,62,62,0.75)', color: '#F2EDE7' }}>
+            {win.iframeUrl}
+          </div>
+        </div>
+      )
+    }
   }
 
   if (win.isMinimized) return null

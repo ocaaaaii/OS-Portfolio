@@ -16,7 +16,7 @@ export default function AppIcon({ app, size = 'md' }: Props) {
   return (
     <button
       onClick={() =>
-        openWindow({ id: app.id, type: app.type, title: app.label, iframeUrl: app.iframeUrl })
+        openWindow({ id: app.id, type: app.type, title: app.label, iframeUrl: app.iframeUrl, previewImg: app.previewImg })
       }
       className="flex flex-col items-center gap-1.5 group cursor-pointer select-none"
     >

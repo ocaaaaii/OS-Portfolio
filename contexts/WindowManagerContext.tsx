@@ -10,6 +10,7 @@ export interface WindowInstance {
   isMinimized: boolean
   zIndex: number
   iframeUrl?: string
+  previewImg?: string
   position: { x: number; y: number }
   size: { width: number; height: number }
 }
