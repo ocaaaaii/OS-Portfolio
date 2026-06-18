@@ -14,17 +14,6 @@ export default function ReadmeContent() {
 
       <section>
         <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
-          About This Project
-        </h3>
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          A browser-based <strong style={{ color: 'var(--text-primary)' }}>OS-style personal portfolio</strong> inspired by the desktop UI metaphor.
-          Instead of a traditional scrolling page, everything lives inside an interactive desktop —
-          widgets, draggable windows, a working terminal, and project showcases via iframe.
-        </p>
-      </section>
-
-      <section>
-        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
           About CA
         </h3>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -46,9 +35,21 @@ export default function ReadmeContent() {
           <li>&#9992;&#65039;  3 months immersion in San Francisco — English fluent (pre-Advanced), conversational Japanese &amp; still learning</li>
           <li>&#127915;  Music &amp; dancing are my reset between coding sessions</li>
           <li>&#127828;  Obsessed with picnics — good food, good view, good vibes</li>
+          <li>&#9992;&#65039;  Love traveling — always planning the next trip</li>
           <li>&#129302;  Currently deep in ML / DL / Image Processing at ITRI</li>
           <li>&#129504;  MBTI: INTJ</li>
         </ul>
+      </section>
+
+      <section>
+        <h3 className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>
+          About This Project
+        </h3>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          A browser-based <strong style={{ color: 'var(--text-primary)' }}>OS-style personal portfolio</strong> inspired by the desktop UI metaphor.
+          Instead of a traditional scrolling page, everything lives inside an interactive desktop —
+          widgets, draggable windows, a working terminal, and project showcases via iframe.
+        </p>
       </section>
 
       <section>
