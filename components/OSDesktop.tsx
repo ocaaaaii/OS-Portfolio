@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { WindowManagerProvider, useWindowManager } from '@/contexts/WindowManagerContext'
 import { CustomProjectsProvider, useCustomProjects, CustomProject } from '@/contexts/CustomProjectsContext'
+import { GalleryProvider } from '@/contexts/GalleryContext'
 import { PROJECT_APPS, SYSTEM_APPS } from '@/data/appConfig'
 import TopBar from './TopBar'
 import Dock from './Dock'
@@ -129,6 +130,7 @@ function Desktop() {
 
 export default function OSDesktop() {
   return (
+    <GalleryProvider>
     <CustomProjectsProvider>
       <WindowManagerProvider>
         <div className="w-screen h-screen overflow-hidden relative">
@@ -138,5 +140,6 @@ export default function OSDesktop() {
         </div>
       </WindowManagerProvider>
     </CustomProjectsProvider>
+    </GalleryProvider>
   )
 }

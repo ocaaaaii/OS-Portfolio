@@ -7,6 +7,7 @@ import Terminal from './Terminal'
 import ReadmeContent from './ReadmeContent'
 import ContactContent from './ContactContent'
 import VibeCodingContent from './VibeCodingContent'
+import GalleryContent from './GalleryContent'
 
 interface Props { win: WindowInstance }
 
@@ -43,6 +44,8 @@ export default function WindowModal({ win }: Props) {
     content = <ContactContent />
   } else if (win.type === 'vibecoding') {
     content = <VibeCodingContent />
+  } else if (win.type === 'gallery') {
+    content = <GalleryContent />
   } else if (win.type === 'project' && win.iframeUrl) {
     if (win.previewImg) {
       content = (

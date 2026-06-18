@@ -75,6 +75,13 @@ export const SYSTEM_APPS: AppConfig[] = [
     emoji: 'SOP',
     bg: '#7B6FA0',
   },
+  {
+    id: 'gallery',
+    type: 'gallery',
+    label: 'Gallery',
+    emoji: '✦',
+    bg: '#B07A6E',
+  },
 ]
 
 export const ALL_APPS = [...PROJECT_APPS, ...SYSTEM_APPS]
