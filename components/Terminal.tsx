@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
+import { useCustomProjects } from '@/contexts/CustomProjectsContext'
 
 const HELP_TEXT = `Available commands:
   help        show this list
@@ -46,9 +47,11 @@ const CONTACT_TEXT = `📧  joannewu0314@gmail.com
 🐙  github.com/ocaaaaii
 📍  Taiwan (open to remote / relocation)`
 
+const PROJECT_APPS_COUNT = 3 // Mochi, Stock, TipSplit
 type Line = { text: string; isCmd?: boolean }
 
 export default function Terminal() {
+  const { customProjects } = useCustomProjects()
   const [lines, setLines] = useState<Line[]>([
     { text: 'Joanne OS Terminal v1.0.0' },
     { text: 'Type "help" to see available commands.' },
@@ -79,7 +82,15 @@ export default function Terminal() {
       case 'help':       push(HELP_TEXT); break
       case 'whoami':     push(WHOAMI_TEXT); break
       case 'skills':     push(SKILLS_TEXT); break
-      case 'projects':   push(PROJECTS_TEXT); break
+      case 'projects': {
+        const extra = customProjects.length > 0
+          ? '\n' + customProjects.map((p, i) =>
+              `[${PROJECT_APPS_COUNT + i + 1}] ${p.label.padEnd(14)} — ${p.description || p.iframeUrl}`
+            ).join('\n')
+          : ''
+        push(PROJECTS_TEXT + extra)
+        break
+      }
       case 'experience': push(EXPERIENCE_TEXT); break
       case 'contact':    push(CONTACT_TEXT); break
       case 'clear':
