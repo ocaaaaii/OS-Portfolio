@@ -45,16 +45,31 @@ function parseMarkdown(md: string): ReactNode[] {
       i++; continue
     }
 
-    // Math block: $$...$$
-    if (trimmed.startsWith('$$') && trimmed.endsWith('$$') && trimmed.length > 4) {
-      const formula = trimmed.slice(2, -2).trim()
+    // Math block: $$...$$  (single-line OR multi-line)
+    if (trimmed.startsWith('$$')) {
+      let formula = ''
+      if (trimmed.endsWith('$$') && trimmed.length > 4) {
+        // Single-line: $$formula$$
+        formula = trimmed.slice(2, -2).trim()
+        i++
+      } else {
+        // Multi-line: opening $$ on its own line
+        i++
+        const fLines: string[] = []
+        while (i < lines.length && lines[i].trim() !== '$$') {
+          fLines.push(lines[i])
+          i++
+        }
+        if (i < lines.length) i++ // skip closing $$
+        formula = fLines.join('\n').trim()
+      }
       blocks.push(
-        <div key={key++} className="my-3 px-4 py-3 rounded-xl font-mono text-sm overflow-x-auto leading-relaxed"
+        <div key={key++} className="my-3 px-4 py-3 rounded-xl font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap"
           style={{ background: 'rgba(106,152,150,0.10)', border: '1px solid var(--glass-border)', color: 'var(--teal-dark)', fontSize: '12px' }}>
           {formula}
         </div>
       )
-      i++; continue
+      continue
     }
 
     // Blockquote: > ...
@@ -192,6 +207,9 @@ function parseMarkdown(md: string): ReactNode[] {
           {renderInline(paraLines.join(' '))}
         </p>
       )
+    } else {
+      // Safety: if nothing matched and nothing consumed, skip the line to avoid infinite loop
+      i++
     }
   }
 
