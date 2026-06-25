@@ -51,7 +51,13 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     const id = `photo-${Date.now()}`
     setDynamic(prev => {
       const next = [{ ...p, id }, ...prev]
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      } catch {
+        // Storage quota exceeded — still show in session, warn user
+        console.warn('Gallery: localStorage quota exceeded. Photo visible this session only.')
+        alert('儲存空間已滿，照片僅在本次使用中顯示。請考慮刪除部分已上傳的照片。')
+      }
       return next
     })
   }
