@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { WindowManagerProvider, useWindowManager } from '@/contexts/WindowManagerContext'
 import { CustomProjectsProvider, useCustomProjects, CustomProject } from '@/contexts/CustomProjectsContext'
 import { GalleryProvider } from '@/contexts/GalleryContext'
-import { NotesProvider, useNotes, Note } from '@/contexts/NotesContext'
+import { NotesProvider, useNotes, Note, NOTE_COLORS } from '@/contexts/NotesContext'
 import { PROJECT_APPS, SYSTEM_APPS, NOTE_SYSTEM_APPS } from '@/data/appConfig'
 import TopBar from './TopBar'
 import Dock from './Dock'
@@ -203,22 +203,48 @@ function DeleteProjectConfirm({ onConfirm, onCancel }: { onConfirm: () => void; 
   )
 }
 
+// Color picker popover for notes
+function NoteColorPicker({ noteId, current, onClose }: { noteId: string; current: string; onClose: () => void }) {
+  const { updateNoteColor } = useNotes()
+  return (
+    <div
+      className="absolute -bottom-14 left-1/2 -translate-x-1/2 z-50 rounded-xl p-2 flex gap-1.5 flex-wrap shadow-lg"
+      style={{ background: 'rgba(242,237,231,0.97)', border: '1px solid var(--glass-border)', width: '132px' }}
+      onClick={e => e.stopPropagation()}
+    >
+      {NOTE_COLORS.map(c => (
+        <button
+          key={c}
+          onClick={() => { updateNoteColor(noteId, c); onClose() }}
+          className="w-6 h-6 rounded-full transition-transform hover:scale-110"
+          style={{
+            backgroundColor: c,
+            boxShadow: current === c ? `0 0 0 1px white, 0 0 0 2.5px ${c}` : 'none',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
 // Note icon component
 function NoteIcon({ note }: { note: Note }) {
   const { openWindow } = useWindowManager()
   const { removeNote } = useNotes()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showColorPicker, setShowColorPicker] = useState(false)
+  const iconColor = note.color ?? '#5A5272'
   const px = 64
   return (
     <>
       <div className="relative group">
         <button
-          onClick={() => openWindow({ id: note.id, type: 'note', title: note.title })}
+          onClick={() => { setShowColorPicker(false); openWindow({ id: note.id, type: 'note', title: note.title }) }}
           className="flex flex-col items-center gap-1.5 cursor-pointer select-none"
         >
           <div
             className="flex items-center justify-center shadow-md transition-transform duration-150 group-hover:scale-110 group-active:scale-95"
-            style={{ width: px, height: px, borderRadius: '22%', backgroundColor: '#5A5272', flexShrink: 0 }}
+            style={{ width: px, height: px, borderRadius: '22%', backgroundColor: iconColor, flexShrink: 0 }}
           >
             <span style={{ fontSize: '26px' }}>📝</span>
           </div>
@@ -227,13 +253,31 @@ function NoteIcon({ note }: { note: Note }) {
             {note.title}
           </span>
         </button>
-        {/* Delete button — hover only, requires password */}
+
+        {/* Colour button */}
+        <button
+          onClick={e => { e.stopPropagation(); setShowColorPicker(v => !v) }}
+          className="absolute -top-1 left-0 w-5 h-5 rounded-full items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity hidden group-hover:flex"
+          style={{ background: iconColor, border: '1.5px solid rgba(255,255,255,0.6)', zIndex: 10 }}
+          title="Change colour"
+        >🎨</button>
+
+        {/* Delete button */}
         <button
           onClick={e => { e.stopPropagation(); setShowDeleteConfirm(true) }}
           className="absolute -top-1 -right-1 w-5 h-5 rounded-full items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity hidden group-hover:flex"
           style={{ background: 'rgba(200,80,60,0.85)', color: '#fff', zIndex: 10 }}
           title="Delete note"
         >✕</button>
+
+        {/* Color picker popover */}
+        {showColorPicker && (
+          <NoteColorPicker
+            noteId={note.id}
+            current={iconColor}
+            onClose={() => setShowColorPicker(false)}
+          />
+        )}
       </div>
 
       {showDeleteConfirm && (

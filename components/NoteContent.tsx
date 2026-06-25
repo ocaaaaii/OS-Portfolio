@@ -1,12 +1,31 @@
 'use client'
 import { useNotes } from '@/contexts/NotesContext'
 import { ReactNode, Fragment } from 'react'
+import katex from 'katex'
+
+function renderMath(formula: string, display: boolean): ReactNode {
+  try {
+    const html = katex.renderToString(formula.trim(), {
+      displayMode: display,
+      throwOnError: false,
+      output: 'html',
+    })
+    return (
+      <span
+        dangerouslySetInnerHTML={{ __html: html }}
+        className={display ? 'block overflow-x-auto py-2' : 'inline'}
+      />
+    )
+  } catch {
+    return <code style={{ color: 'var(--teal-dark)' }}>{formula}</code>
+  }
+}
 
 // ── Inline formatter ─────────────────────────────────────────────────────────
 function renderInline(text: string): ReactNode {
   const parts: ReactNode[] = []
-  // Patterns: **bold** | *italic* | `code` | ==highlight== | ~~strike~~
-  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`|==(.+?)==|~~(.+?)~~/g
+  // Patterns: **bold** | *italic* | `code` | ==highlight== | ~~strike~~ | $math$
+  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`|==(.+?)==|~~(.+?)~~|\$([^$\n]+?)\$/g
   let last = 0
   let m: RegExpExecArray | null
   let i = 0
@@ -19,6 +38,7 @@ function renderInline(text: string): ReactNode {
       style={{ background: 'rgba(132,156,146,0.18)', color: 'var(--teal-dark)' }}>{m[3]}</code>)
     else if (m[4]) parts.push(<mark key={i++} style={{ background: 'rgba(196,132,90,0.22)', padding: '0 2px', borderRadius: 3, color: 'var(--text-primary)' }}>{m[4]}</mark>)
     else if (m[5]) parts.push(<s key={i++} style={{ opacity: 0.5 }}>{m[5]}</s>)
+    else if (m[6]) parts.push(<Fragment key={i++}>{renderMath(m[6], false)}</Fragment>)
     last = m.index + m[0].length
   }
   if (last < text.length) parts.push(<Fragment key={i++}>{text.slice(last)}</Fragment>)
@@ -64,9 +84,9 @@ function parseMarkdown(md: string): ReactNode[] {
         formula = fLines.join('\n').trim()
       }
       blocks.push(
-        <div key={key++} className="my-3 px-4 py-3 rounded-xl font-mono overflow-x-auto leading-relaxed whitespace-pre-wrap"
-          style={{ background: 'rgba(106,152,150,0.10)', border: '1px solid var(--glass-border)', color: 'var(--teal-dark)', fontSize: '12px' }}>
-          {formula}
+        <div key={key++} className="my-3 px-4 py-3 rounded-xl overflow-x-auto text-center"
+          style={{ background: 'rgba(106,152,150,0.08)', border: '1px solid var(--glass-border)' }}>
+          {renderMath(formula, true)}
         </div>
       )
       continue

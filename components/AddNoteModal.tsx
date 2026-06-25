@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useNotes } from '@/contexts/NotesContext'
+import { useNotes, NOTE_COLORS } from '@/contexts/NotesContext'
 
 async function hashInput(input: string): Promise<string> {
   const encoded = new TextEncoder().encode(input)
@@ -17,6 +17,7 @@ export default function AddNoteModal({ onClose }: Props) {
   const [pwError, setPwError] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [color, setColor] = useState(NOTE_COLORS[0])
 
   async function handlePw(e: React.FormEvent) {
     e.preventDefault()
@@ -29,7 +30,7 @@ export default function AddNoteModal({ onClose }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim() || !content.trim()) return
-    addNote(title.trim(), content.trim())
+    addNote(title.trim(), content.trim(), color)
     onClose()
   }
 
@@ -74,6 +75,29 @@ export default function AddNoteModal({ onClose }: Props) {
             </form>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Color picker */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                  Icon Color
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {NOTE_COLORS.map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColor(c)}
+                      className="w-7 h-7 rounded-full transition-transform hover:scale-110"
+                      style={{
+                        backgroundColor: c,
+                        outline: color === c ? `2px solid ${c}` : 'none',
+                        outlineOffset: '2px',
+                        boxShadow: color === c ? `0 0 0 1px white, 0 0 0 3px ${c}` : 'none',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
               {/* Title */}
               <div className="space-y-1">
                 <label className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>

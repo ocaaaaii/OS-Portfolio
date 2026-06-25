@@ -5,8 +5,22 @@ export interface Note {
   id: string
   title: string
   content: string   // markdown
+  color: string     // icon background color
   createdAt: number
 }
+
+export const NOTE_COLORS = [
+  '#5A5272', // purple (default)
+  '#7B6FA0', // lavender
+  '#6A8178', // teal
+  '#849C92', // sage
+  '#B07A6E', // dusty rose
+  '#C4845A', // terracotta
+  '#9B84C4', // soft violet
+  '#7A9CAA', // slate blue
+  '#8A7060', // warm brown
+  '#5E7A6A', // forest
+]
 
 const STORAGE_KEY = 'ca-notes'
 
@@ -99,13 +113,15 @@ const INITIAL_NOTE: Note = {
   id: 'note-ml-metrics',
   title: 'ML 模型評估指標：Accuracy、Precision、Recall、F1 與 AUC',
   content: ML_NOTE_CONTENT,
+  color: NOTE_COLORS[0],
   createdAt: Date.now(),
 }
 
 interface CtxValue {
   notes: Note[]
-  addNote: (title: string, content: string) => void
+  addNote: (title: string, content: string, color?: string) => void
   removeNote: (id: string) => void
+  updateNoteColor: (id: string, color: string) => void
   getNote: (id: string) => Note | undefined
 }
 
@@ -113,6 +129,7 @@ const Ctx = createContext<CtxValue>({
   notes: [],
   addNote: () => {},
   removeNote: () => {},
+  updateNoteColor: () => {},
   getNote: () => undefined,
 })
 
@@ -137,8 +154,8 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  function addNote(title: string, content: string) {
-    const note: Note = { id: `note-${Date.now()}`, title, content, createdAt: Date.now() }
+  function addNote(title: string, content: string, color = NOTE_COLORS[0]) {
+    const note: Note = { id: `note-${Date.now()}`, title, content, color, createdAt: Date.now() }
     setNotes(prev => {
       const next = [note, ...prev]
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
@@ -154,12 +171,20 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  function updateNoteColor(id: string, color: string) {
+    setNotes(prev => {
+      const next = prev.map(n => n.id === id ? { ...n, color } : n)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      return next
+    })
+  }
+
   function getNote(id: string) {
     return notes.find(n => n.id === id)
   }
 
   return (
-    <Ctx.Provider value={{ notes, addNote, removeNote, getNote }}>
+    <Ctx.Provider value={{ notes, addNote, removeNote, updateNoteColor, getNote }}>
       {children}
     </Ctx.Provider>
   )
