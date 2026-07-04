@@ -143,6 +143,7 @@ function AddPhotoModal({ onClose }: { onClose: () => void }) {
   const [pwError, setPwError] = useState(false)
   const [src, setSrc] = useState<string | null>(null)
   const [description, setDescription] = useState('')
+  const [uploading, setUploading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   async function handlePw(e: React.FormEvent) {
@@ -180,11 +181,17 @@ function AddPhotoModal({ onClose }: { onClose: () => void }) {
     reader.readAsDataURL(file)
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!src) return
-    addPhoto({ src, description: description.trim() || undefined })
-    onClose()
+    if (!src || uploading) return
+    setUploading(true)
+    try {
+      await addPhoto(src, description.trim() || undefined)
+      onClose()
+    } catch {
+      alert('上傳失敗，請再試一次')
+      setUploading(false)
+    }
   }
 
   return (
@@ -255,10 +262,10 @@ function AddPhotoModal({ onClose }: { onClose: () => void }) {
                   style={{ background: 'rgba(132,156,146,0.15)', color: 'var(--text-secondary)', border: '1px solid var(--glass-border)' }}>
                   Cancel
                 </button>
-                <button type="submit" disabled={!src}
+                <button type="submit" disabled={!src || uploading}
                   className="flex-1 py-2.5 rounded-xl text-sm font-semibold hover:opacity-85 transition-opacity disabled:opacity-40"
                   style={{ background: '#B07A6E', color: '#fff' }}>
-                  Add
+                  {uploading ? 'Uploading…' : 'Add'}
                 </button>
               </div>
             </form>

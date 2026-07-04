@@ -1,5 +1,6 @@
 'use client'
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export interface Note {
   id: string
@@ -21,8 +22,6 @@ export const NOTE_COLORS = [
   '#8A7060', // warm brown
   '#5E7A6A', // forest
 ]
-
-const STORAGE_KEY = 'ca-notes'
 
 const ML_NOTE_CONTENT = `評估模型好壞不能只靠「體感」，需要量化指標。常見的有 **Accuracy**、**Precision**、**Recall**、**F1-score**，以及用於曲線比較的 **ROC-AUC** 與 **PR-AUC**。
 
@@ -114,7 +113,18 @@ const INITIAL_NOTE: Note = {
   title: 'ML 模型評估指標：Accuracy、Precision、Recall、F1 與 AUC',
   content: ML_NOTE_CONTENT,
   color: NOTE_COLORS[0],
-  createdAt: Date.now(),
+  createdAt: 1700000000000, // fixed timestamp so seed is idempotent
+}
+
+// Map Supabase row (snake_case) → Note (camelCase)
+function rowToNote(row: Record<string, unknown>): Note {
+  return {
+    id:        row.id        as string,
+    title:     row.title     as string,
+    content:   row.content   as string,
+    color:     row.color     as string,
+    createdAt: row.created_at as number,
+  }
 }
 
 interface CtxValue {
@@ -137,46 +147,72 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   const [notes, setNotes] = useState<Note[]>([])
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      const parsed: Note[] = saved ? JSON.parse(saved) : []
-      // Seed the initial ML note if it's not already present
-      const hasInitial = parsed.some(n => n.id === INITIAL_NOTE.id)
-      if (!hasInitial) {
-        const seeded = [INITIAL_NOTE, ...parsed]
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded))
-        setNotes(seeded)
-      } else {
-        setNotes(parsed)
+    async function load() {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Notes load failed:', error.message)
+        setNotes([INITIAL_NOTE])
+        return
       }
-    } catch {
-      setNotes([INITIAL_NOTE])
+
+      const loaded = (data ?? []).map(rowToNote)
+
+      // Seed initial ML note if missing
+      const hasInitial = loaded.some(n => n.id === INITIAL_NOTE.id)
+      if (!hasInitial) {
+        supabase.from('notes').insert({
+          id:         INITIAL_NOTE.id,
+          title:      INITIAL_NOTE.title,
+          content:    INITIAL_NOTE.content,
+          color:      INITIAL_NOTE.color,
+          created_at: INITIAL_NOTE.createdAt,
+        }).then(({ error: e }) => { if (e) console.error('Seed note failed:', e.message) })
+        setNotes([INITIAL_NOTE, ...loaded])
+      } else {
+        setNotes(loaded)
+      }
     }
+    load()
   }, [])
 
   function addNote(title: string, content: string, color = NOTE_COLORS[0]) {
-    const note: Note = { id: `note-${Date.now()}`, title, content, color, createdAt: Date.now() }
-    setNotes(prev => {
-      const next = [note, ...prev]
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-      return next
-    })
+    const note: Note = {
+      id: `note-${Date.now()}`,
+      title,
+      content,
+      color,
+      createdAt: Date.now(),
+    }
+    // Optimistic update
+    setNotes(prev => [note, ...prev])
+    // Persist to Supabase
+    supabase.from('notes').insert({
+      id:         note.id,
+      title:      note.title,
+      content:    note.content,
+      color:      note.color,
+      created_at: note.createdAt,
+    }).then(({ error }) => { if (error) console.error('addNote failed:', error.message) })
   }
 
   function removeNote(id: string) {
-    setNotes(prev => {
-      const next = prev.filter(n => n.id !== id)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-      return next
-    })
+    // Optimistic update
+    setNotes(prev => prev.filter(n => n.id !== id))
+    // Persist to Supabase
+    supabase.from('notes').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('removeNote failed:', error.message) })
   }
 
   function updateNoteColor(id: string, color: string) {
-    setNotes(prev => {
-      const next = prev.map(n => n.id === id ? { ...n, color } : n)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
-      return next
-    })
+    // Optimistic update
+    setNotes(prev => prev.map(n => n.id === id ? { ...n, color } : n))
+    // Persist to Supabase
+    supabase.from('notes').update({ color }).eq('id', id)
+      .then(({ error }) => { if (error) console.error('updateNoteColor failed:', error.message) })
   }
 
   function getNote(id: string) {
