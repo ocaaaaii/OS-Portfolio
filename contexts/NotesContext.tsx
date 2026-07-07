@@ -108,6 +108,8 @@ X 軸為 Recall、Y 軸為 Precision 的曲線，**越靠右上角越好**。
 
 在正例極少的情況下（如詐欺偵測），PR-AUC 比 ROC-AUC 更能反映模型真實能力，因為它直接反映你在少數正例上的表現。`
 
+const CACHE_KEY = 'ca-notes-cache'
+
 const INITIAL_NOTE: Note = {
   id: 'note-ml-metrics',
   title: 'ML 模型評估指標：Accuracy、Precision、Recall、F1 與 AUC',
@@ -147,7 +149,17 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   const [notes, setNotes] = useState<Note[]>([])
 
   useEffect(() => {
-    async function load() {
+    // 1. Show cache immediately (instant)
+    try {
+      const cached = localStorage.getItem(CACHE_KEY)
+      if (cached) {
+        const parsed: Note[] = JSON.parse(cached)
+        setNotes(parsed)
+      }
+    } catch {}
+
+    // 2. Sync from Supabase in background
+    async function sync() {
       const { data, error } = await supabase
         .from('notes')
         .select('*')
@@ -155,7 +167,6 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error('Notes load failed:', error.message)
-        setNotes([INITIAL_NOTE])
         return
       }
 
@@ -171,46 +182,45 @@ export function NotesProvider({ children }: { children: ReactNode }) {
           color:      INITIAL_NOTE.color,
           created_at: INITIAL_NOTE.createdAt,
         }).then(({ error: e }) => { if (e) console.error('Seed note failed:', e.message) })
-        setNotes([INITIAL_NOTE, ...loaded])
+        const fresh = [INITIAL_NOTE, ...loaded]
+        setNotes(fresh)
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(fresh)) } catch {}
       } else {
         setNotes(loaded)
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(loaded)) } catch {}
       }
     }
-    load()
+    sync()
   }, [])
 
   function addNote(title: string, content: string, color = NOTE_COLORS[0]) {
-    const note: Note = {
-      id: `note-${Date.now()}`,
-      title,
-      content,
-      color,
-      createdAt: Date.now(),
-    }
-    // Optimistic update
-    setNotes(prev => [note, ...prev])
-    // Persist to Supabase
+    const note: Note = { id: `note-${Date.now()}`, title, content, color, createdAt: Date.now() }
+    setNotes(prev => {
+      const next = [note, ...prev]
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
     supabase.from('notes').insert({
-      id:         note.id,
-      title:      note.title,
-      content:    note.content,
-      color:      note.color,
-      created_at: note.createdAt,
+      id: note.id, title, content, color, created_at: note.createdAt,
     }).then(({ error }) => { if (error) console.error('addNote failed:', error.message) })
   }
 
   function removeNote(id: string) {
-    // Optimistic update
-    setNotes(prev => prev.filter(n => n.id !== id))
-    // Persist to Supabase
+    setNotes(prev => {
+      const next = prev.filter(n => n.id !== id)
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
     supabase.from('notes').delete().eq('id', id)
       .then(({ error }) => { if (error) console.error('removeNote failed:', error.message) })
   }
 
   function updateNoteColor(id: string, color: string) {
-    // Optimistic update
-    setNotes(prev => prev.map(n => n.id === id ? { ...n, color } : n))
-    // Persist to Supabase
+    setNotes(prev => {
+      const next = prev.map(n => n.id === id ? { ...n, color } : n)
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
     supabase.from('notes').update({ color }).eq('id', id)
       .then(({ error }) => { if (error) console.error('updateNoteColor failed:', error.message) })
   }

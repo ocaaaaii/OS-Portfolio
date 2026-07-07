@@ -11,6 +11,7 @@ export interface GalleryPhoto {
 }
 
 const STORAGE_BUCKET = 'gallery'
+const CACHE_KEY = 'ca-gallery-cache'
 
 interface CtxValue {
   photos: GalleryPhoto[]
@@ -34,28 +35,31 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
   const [dynamic, setDynamic] = useState<GalleryPhoto[]>([])
   const [staticPhotos, setStaticPhotos] = useState<GalleryPhoto[]>([])
 
-  // Load user-uploaded photos from Supabase
+  // Load user-uploaded photos from Supabase (with cache for instant display)
   useEffect(() => {
-    async function load() {
+    // 1. Show cache immediately
+    try {
+      const cached = localStorage.getItem(CACHE_KEY)
+      if (cached) setDynamic(JSON.parse(cached))
+    } catch {}
+
+    // 2. Sync from Supabase in background
+    async function sync() {
       const { data, error } = await supabase
         .from('gallery_photos')
         .select('*')
         .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Gallery load failed:', error.message)
-        return
-      }
-      setDynamic(
-        (data ?? []).map(row => ({
-          id:          row.id as string,
-          src:         row.src as string,
-          description: row.description as string | undefined,
-          storagePath: row.storage_path as string | undefined,
-        }))
-      )
+      if (error) { console.error('Gallery load failed:', error.message); return }
+      const photos = (data ?? []).map(row => ({
+        id:          row.id as string,
+        src:         row.src as string,
+        description: row.description as string | undefined,
+        storagePath: row.storage_path as string | undefined,
+      }))
+      setDynamic(photos)
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(photos)) } catch {}
     }
-    load()
+    sync()
   }, [])
 
   // Fetch numbered static photos from public/ via API route
@@ -105,14 +109,22 @@ export function GalleryProvider({ children }: { children: ReactNode }) {
     })
     if (dbError) console.error('Gallery DB insert failed:', dbError.message)
 
-    // Update state
-    setDynamic(prev => [{ id, src: publicUrl, description, storagePath: filename }, ...prev])
+    // Update state + cache
+    setDynamic(prev => {
+      const next = [{ id, src: publicUrl, description, storagePath: filename }, ...prev]
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
   }
 
   function removePhoto(id: string) {
     const photo = dynamic.find(p => p.id === id)
-    // Optimistic update
-    setDynamic(prev => prev.filter(p => p.id !== id))
+    // Optimistic update + cache
+    setDynamic(prev => {
+      const next = prev.filter(p => p.id !== id)
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch {}
+      return next
+    })
     // Delete from Storage (if has path) + DB
     if (photo?.storagePath) {
       supabase.storage.from(STORAGE_BUCKET).remove([photo.storagePath])
