@@ -14,6 +14,26 @@ export interface AppConfig {
 
 export const PROJECT_APPS: AppConfig[] = [
   {
+    id: 'project-moon-tarot',
+    type: 'project',
+    label: 'AI Moon Tarot',
+    emoji: '🌙',
+    bg: '#1A1330',
+    imgSrc: '/AI-Moon-Tarot.png',
+    iconScale: 1.0,
+    iframeUrl: 'https://ai-moon-tarot.vercel.app/',
+  },
+  {
+    id: 'project-parenting',
+    type: 'project',
+    label: 'AI Parenting Navigator',
+    emoji: '🍼',
+    bg: '#F0E8DC',
+    imgSrc: '/AI-Parenting-Platform.png',
+    iconScale: 1.0,
+    iframeUrl: 'https://parent-navigator.vercel.app/',
+  },
+  {
     id: 'project-mochi',
     type: 'project',
     label: 'Mochi Habit',
