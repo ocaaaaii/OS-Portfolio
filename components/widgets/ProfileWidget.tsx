@@ -1,5 +1,7 @@
 'use client'
 import Image from 'next/image'
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
 
 function LinkedInIcon() {
   return (
@@ -18,9 +20,55 @@ function GitHubIcon() {
 }
 
 export default function ProfileWidget() {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced || !containerRef.current) return
+
+    const ctx = gsap.context(() => {
+      // Avatar + header pops in first
+      gsap.from('.profile-header', {
+        opacity: 0,
+        y: 10,
+        duration: 0.5,
+        ease: 'power3.out',
+        delay: 0.1,
+      })
+      // Bio line
+      gsap.from('.profile-bio', {
+        opacity: 0,
+        y: 6,
+        duration: 0.4,
+        ease: 'power2.out',
+        delay: 0.35,
+      })
+      // Contact items stagger
+      gsap.from('.contact-item', {
+        opacity: 0,
+        x: -8,
+        stagger: 0.08,
+        duration: 0.35,
+        ease: 'power2.out',
+        delay: 0.55,
+      })
+      // Buttons
+      gsap.from('.profile-btn', {
+        opacity: 0,
+        y: 6,
+        stagger: 0.07,
+        duration: 0.35,
+        ease: 'power2.out',
+        delay: 0.85,
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
+  }, [])
+
   return (
-    <div className="glass rounded-2xl p-5 fade-up flex flex-col gap-4" style={{ animationDelay: '0ms' }}>
-      <div className="flex items-center gap-4">
+    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up flex flex-col gap-4" style={{ animationDelay: '0ms' }}>
+      <div className="profile-header flex items-center gap-4">
         <div className="relative w-16 h-16 shrink-0">
           <Image src="/my_pic.jpg" alt="Joanne Wu" fill
             className="object-cover rounded-full shadow-md"
@@ -30,49 +78,57 @@ export default function ProfileWidget() {
           <h1 className="text-sm font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>
             Joanne Wu&nbsp;<span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(吳蕎安)</span>
           </h1>
-          <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>Software Engineer · Technical PM</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>AI Engineer @ Heph.AI</p>
+            <span
+              className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+              style={{ background: 'rgba(99,102,241,0.15)', color: '#818CF8', letterSpacing: '0.04em' }}
+            >
+              NOW
+            </span>
+          </div>
         </div>
       </div>
 
-      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-        MS InfoMgmt GPA 3.98 · Full-stack dev at TSMC · AI research at ITRI
+      <p className="profile-bio text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        Building LLM &amp; Agent Platforms · MS InfoMgmt GPA 3.98 · Prev. TSMC · ITRI
       </p>
 
       <div className="space-y-1.5">
-        <div className="flex items-center gap-2">
+        <div className="contact-item flex items-center gap-2">
           <span className="text-sm">&#128231;</span>
           <a href="mailto:joannewu0314@gmail.com" className="text-xs hover:underline" style={{ color: 'var(--teal)' }}>
             joannewu0314@gmail.com
           </a>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="contact-item flex items-center gap-2">
           <span className="text-sm">&#128222;</span>
           <a href="tel:+886988984614" className="text-xs hover:underline" style={{ color: 'var(--teal)' }}>
             +886 988 984 614
           </a>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Open to opportunities</span>
+        <div className="contact-item flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#818CF8' }} />
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>AI Engineer · Open to collaboration</span>
         </div>
       </div>
 
       <div className="flex gap-2 pt-1">
         <a href="https://www.linkedin.com/in/joannewu-ca/" target="_blank" rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity"
+          className="profile-btn flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity"
           style={{ background: 'var(--teal)', color: '#fff' }}>
           <LinkedInIcon />
           LinkedIn
         </a>
         <a href="https://github.com/ocaaaaii" target="_blank" rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity"
+          className="profile-btn flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity"
           style={{ background: 'var(--teal-dark)', color: '#fff' }}>
           <GitHubIcon />
           GitHub
         </a>
       </div>
       <a href="/CA.CV.pdf" target="_blank" rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity w-full"
+        className="profile-btn flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity w-full"
         style={{ background: 'rgba(106,152,150,0.15)', color: 'var(--teal-dark)', border: '1px solid var(--glass-border)' }}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
