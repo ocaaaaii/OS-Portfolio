@@ -49,31 +49,37 @@ export default function ExperienceWidget() {
   }
 
   return (
-    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up space-y-4 overflow-y-auto" style={{ animationDelay: '120ms' }}>
+    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up space-y-4 overflow-y-auto h-full" style={{ animationDelay: '120ms' }}>
       <div>
         <SectionLabel><span className="exp-section-label">Experience</span></SectionLabel>
-        <div className="space-y-3">
-          {workEntries.map(w => (
-            <div key={w.id} className="work-entry flex items-start gap-2.5">
-              <div className="shrink-0 mt-0.5">
-                <LogoBadge src={w.logoPath} alt={w.company} size={28} fallbackBg={w.fallbackBg} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <p className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
-                    {w.company}
-                    <span className="font-normal ml-1" style={{ color: 'var(--text-muted)' }}>{w.role}</span>
-                  </p>
-                  {w.isCurrent && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
-                      style={{ background: 'rgba(99,102,241,0.15)', color: '#818CF8' }}>● NOW</span>
-                  )}
+        {/* Timeline */}
+        <div className="relative">
+          {/* Vertical connector line */}
+          <div className="absolute left-[13px] top-5 bottom-3 w-px pointer-events-none"
+            style={{ background: 'linear-gradient(to bottom, var(--teal-light), var(--glass-border) 80%, transparent)' }} />
+          <div className="space-y-3">
+            {workEntries.map(w => (
+              <div key={w.id} className="work-entry flex items-start gap-2.5">
+                <div className="shrink-0 mt-0.5 relative z-10">
+                  <LogoBadge src={w.logoPath} alt={w.company} size={28} fallbackBg={w.fallbackBg} />
                 </div>
-                <p className="text-[10px]" style={{ color: 'var(--teal)' }}>{w.period}</p>
-                <p className="text-[10px] leading-snug mt-0.5" style={{ color: 'var(--text-secondary)' }}>{w.description}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                      {w.company}
+                      <span className="font-normal ml-1" style={{ color: 'var(--text-muted)' }}>{w.role}</span>
+                    </p>
+                    {w.isCurrent && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                        style={{ background: 'rgba(99,102,241,0.15)', color: '#818CF8' }}>● NOW</span>
+                    )}
+                  </div>
+                  <p className="text-[10px]" style={{ color: 'var(--teal)' }}>{w.period}</p>
+                  <p className="text-[10px] leading-snug mt-0.5" style={{ color: 'var(--text-secondary)' }}>{w.description}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 

@@ -27,7 +27,7 @@ export default function SkillsWidget() {
   }
 
   return (
-    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up space-y-4" style={{ animationDelay: '60ms' }}>
+    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up space-y-4 h-full" style={{ animationDelay: '60ms' }}>
       <h2 className="skills-header text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: 'var(--text-muted)' }}>
         Skills
       </h2>
@@ -38,8 +38,12 @@ export default function SkillsWidget() {
           </p>
           <div className="flex flex-wrap gap-1.5">
             {group.skills.map(s => (
-              <span key={s} className="skill-tag text-[10px] px-2 py-0.5 rounded-full font-medium"
-                style={{ background: 'rgba(132,156,146,0.12)', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)' }}>
+              <span key={s} className="skill-tag text-[10px] px-2 py-0.5 rounded-full font-medium transition-transform hover:scale-105"
+                style={{
+                  background: `${group.color}18`,
+                  border: `1px solid ${group.color}40`,
+                  color: group.color,
+                }}>
                 {s}
               </span>
             ))}

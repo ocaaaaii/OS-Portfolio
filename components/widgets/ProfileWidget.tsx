@@ -44,15 +44,15 @@ export default function ProfileWidget() {
   const p = profile!
 
   return (
-    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up flex flex-col gap-4" style={{ animationDelay: '0ms' }}>
+    <div ref={containerRef} className="glass rounded-2xl p-5 fade-up flex flex-col gap-4 h-full" style={{ animationDelay: '0ms' }}>
       <div className="profile-header flex items-center gap-4">
         <div className="relative w-16 h-16 shrink-0">
           <Image src="/my_pic.jpg" alt={p.name} fill className="object-cover rounded-full shadow-md"
             style={{ border: '2px solid var(--teal-light)' }} />
         </div>
         <div>
-          <h1 className="text-sm font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>
-            {p.name}&nbsp;<span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({p.nameZh})</span>
+          <h1 className="text-base font-bold leading-snug" style={{ color: 'var(--text-primary)' }}>
+            {p.name}&nbsp;<span className="text-sm" style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({p.nameZh})</span>
           </h1>
           <div className="flex items-center gap-1.5 mt-1">
             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{p.title}</p>

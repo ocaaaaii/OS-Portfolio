@@ -251,7 +251,7 @@ function Desktop() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-8">
 
           {/* ── Top widgets row ── */}
-          <div id="section-widgets" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div id="section-widgets" className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:items-stretch">
             <ProfileWidget />
             <SkillsWidget />
             <ExperienceWidget />
