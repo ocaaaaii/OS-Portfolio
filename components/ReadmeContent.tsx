@@ -8,7 +8,7 @@ export default function ReadmeContent() {
         </div>
         <div>
           <h2 className="text-lg font-semibold tracking-wide">readme.txt</h2>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Last modified: June 2026</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Last modified: Sep 2026</p>
         </div>
       </div>
 
@@ -17,12 +17,12 @@ export default function ReadmeContent() {
           About CA
         </h3>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          Hi! I&#39;m <strong style={{ color: 'var(--text-primary)' }}>Joanne Wu (吳蕎安)</strong> — a Software Engineer & Technical PM
-          with an MS in Information Management (GPA 3.98) from NSYSU.
-          I&#39;ve built full-stack platforms at <strong style={{ color: 'var(--text-primary)' }}>TSMC</strong>,
-          conducted AI research at <strong style={{ color: 'var(--text-primary)' }}>ITRI</strong>,
-          and ship side projects in my spare time.
-          Currently seeking roles where I can bridge technology and people.
+          Hi! I&#39;m <strong style={{ color: 'var(--text-primary)' }}>Joanne Wu (吳蕎安)</strong> — an AI Engineer at <strong style={{ color: 'var(--text-primary)' }}>Heph.AI</strong>,
+          building LLM &amp; Agentic platforms from the ground up.
+          MS in Information Management (GPA 3.98) from NSYSU.
+          Previously full-stack dev at <strong style={{ color: 'var(--text-primary)' }}>TSMC</strong>,
+          led UI/UX &amp; full-stack on the AI Parenting Navigator at <strong style={{ color: 'var(--text-primary)' }}>ITRI</strong>,
+          and keep shipping side projects for fun.
         </p>
       </section>
 
@@ -36,7 +36,7 @@ export default function ReadmeContent() {
           <li>&#127915;  Music &amp; dancing are my reset between coding sessions</li>
           <li>&#127828;  Obsessed with picnics — good food, good view, good vibes</li>
           <li>&#9992;&#65039;  Love traveling — always planning the next trip</li>
-          <li>&#129302;  Currently deep in AI / ML / DL / Image Processing at ITRI</li>
+          <li>&#129302;  Currently building LLM &amp; Agent platforms at Heph.AI</li>
           <li>&#129504;  MBTI: INTJ-A</li>
         </ul>
       </section>
@@ -59,8 +59,9 @@ export default function ReadmeContent() {
         <ul className="text-sm space-y-1" style={{ color: 'var(--text-secondary)' }}>
           <li><strong style={{ color: 'var(--text-primary)' }}>Next.js 14</strong> — App Router, SPA architecture</li>
           <li><strong style={{ color: 'var(--text-primary)' }}>Tailwind CSS</strong> — utility-first styling</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>GSAP</strong> — entrance &amp; micro-interaction animations</li>
+          <li><strong style={{ color: 'var(--text-primary)' }}>Supabase</strong> — notes, gallery &amp; custom projects (PostgreSQL + Storage)</li>
           <li><strong style={{ color: 'var(--text-primary)' }}>React Context</strong> — window manager (open / minimize / focus / drag)</li>
-          <li><strong style={{ color: 'var(--text-primary)' }}>Lucide React</strong> — icons</li>
           <li><strong style={{ color: 'var(--text-primary)' }}>Vercel</strong> — deployment</li>
         </ul>
       </section>
@@ -75,7 +76,7 @@ export default function ReadmeContent() {
           <li>&#62;&#95;  Terminal — type <code style={{ color: 'var(--accent-terra)' }}>help</code> to explore</li>
           <li>&#64;  Contact — email, phone, LinkedIn, GitHub</li>
           <li>&#128218;  Project apps — live iframes of deployed side projects</li>
-          <li>&#10010;  Custom app creator — add your own apps via localStorage</li>
+          <li>&#10010;  Custom app creator — add your own apps (synced to Supabase)</li>
         </ul>
       </section>
 
