@@ -1,15 +1,15 @@
 'use client'
 import { useState, useMemo, useEffect } from 'react'
 import { WindowManagerProvider, useWindowManager } from '@/contexts/WindowManagerContext'
-import { CustomProjectsProvider, useCustomProjects, CustomProject } from '@/contexts/CustomProjectsContext'
 import { GalleryProvider } from '@/contexts/GalleryContext'
 import { NotesProvider, useNotes, Note, NOTE_COLORS } from '@/contexts/NotesContext'
-import { PROJECT_APPS, SYSTEM_APPS, NOTE_SYSTEM_APPS } from '@/data/appConfig'
+import { SiteDataProvider, useSiteData, ProjectEntry } from '@/contexts/SiteDataContext'
+import { SYSTEM_APPS, NOTE_SYSTEM_APPS } from '@/data/appConfig'
+import type { AppConfig } from '@/data/appConfig'
 import TopBar from './TopBar'
 import Dock from './Dock'
 import AppIcon from './AppIcon'
 import WindowModal from './WindowModal'
-import AddProjectModal from './AddProjectModal'
 import AddNoteModal from './AddNoteModal'
 import ProfileWidget from './widgets/ProfileWidget'
 import SkillsWidget from './widgets/SkillsWidget'
@@ -26,51 +26,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-function CustomAppIcon({ project }: { project: CustomProject }) {
-  const { openWindow } = useWindowManager()
-  const { removeProject } = useCustomProjects()
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const px = 64
-  return (
-    <>
-      <div className="relative group">
-        <button
-          onClick={() => openWindow({ id: project.id, type: 'project', title: project.label, iframeUrl: project.iframeUrl })}
-          className="flex flex-col items-center gap-1.5 cursor-pointer select-none"
-        >
-          <div
-            className="shadow-md transition-transform duration-150 group-hover:scale-110 group-active:scale-95"
-            style={{ width: px, height: px, borderRadius: '22%', overflow: 'hidden', backgroundColor: project.bg, flexShrink: 0 }}
-          >
-            {project.logoDataUrl
-              ? <img src={project.logoDataUrl} alt={project.label} className="w-full h-full object-cover" />
-              : <span className="w-full h-full flex items-center justify-center text-white font-bold text-xl">
-                  {project.label[0]}
-                </span>
-            }
-          </div>
-          <span className="text-xs font-medium text-center leading-tight max-w-[72px] truncate"
-            style={{ color: 'var(--text-primary)' }}>
-            {project.label}
-          </span>
-        </button>
-        {/* Delete button */}
-        <button
-          onClick={e => { e.stopPropagation(); setShowDeleteConfirm(true) }}
-          className="absolute -top-1 -right-1 w-5 h-5 rounded-full items-center justify-center text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity hidden group-hover:flex"
-          style={{ background: 'rgba(200,80,60,0.85)', color: '#fff', zIndex: 10 }}
-          title="Delete project"
-        >✕</button>
-      </div>
-
-      {showDeleteConfirm && (
-        <DeleteProjectConfirm
-          onConfirm={() => { removeProject(project.id); setShowDeleteConfirm(false) }}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
-    </>
-  )
+// Convert CMS ProjectEntry → AppConfig for AppIcon
+function projectToAppConfig(p: ProjectEntry): AppConfig {
+  return {
+    id: p.id, type: 'project', label: p.label, emoji: p.emoji,
+    bg: p.bg, imgSrc: p.imgSrc || undefined, iconScale: p.iconScale,
+    iframeUrl: p.iframeUrl,
+  }
 }
 
 async function hashStr(input: string): Promise<string> {
@@ -120,64 +82,6 @@ function DeleteNoteConfirm({ onConfirm, onCancel }: { onConfirm: () => void; onC
               <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
                 Enter password to delete this note
               </p>
-            </div>
-            <input type="password" value={pw} onChange={e => { setPw(e.target.value); setErr(false) }}
-              placeholder="Password" autoFocus
-              className="w-full px-3 py-2 rounded-xl text-sm outline-none"
-              style={{ background: 'rgba(132,156,146,0.10)', border: `1px solid ${err ? '#C4845A' : 'var(--glass-border)'}`, color: 'var(--text-primary)' }} />
-            {err && <p className="text-xs text-center" style={{ color: '#C4845A' }}>Incorrect password.</p>}
-            <div className="flex gap-2">
-              <button type="button" onClick={onCancel}
-                className="flex-1 py-2 rounded-xl text-xs font-semibold hover:opacity-75 transition-opacity"
-                style={{ background: 'rgba(132,156,146,0.15)', color: 'var(--text-secondary)', border: '1px solid var(--glass-border)' }}>
-                Cancel
-              </button>
-              <button type="submit"
-                className="flex-1 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity"
-                style={{ background: 'rgba(200,80,60,0.75)', color: '#fff' }}>
-                Delete
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Password-protected delete for custom projects
-function DeleteProjectConfirm({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
-  const [pw, setPw] = useState('')
-  const [err, setErr] = useState(false)
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const hash = await hashStr(pw)
-    if (hash === (process.env.NEXT_PUBLIC_ADD_PROJECT_HASH ?? '')) { onConfirm() }
-    else { setErr(true); setPw('') }
-  }
-
-  return (
-    <div className="fixed inset-0 z-[260] flex items-center justify-center"
-      style={{ background: 'rgba(20,15,15,0.55)', backdropFilter: 'blur(6px)' }}
-      onClick={e => { if (e.target === e.currentTarget) onCancel() }}>
-      <div className="glass rounded-2xl w-72 overflow-hidden shadow-2xl">
-        <div className="flex items-center gap-3 px-4 py-3"
-          style={{ background: 'rgba(226,213,197,0.92)', borderBottom: '1px solid var(--glass-border)' }}>
-          <div className="flex gap-1.5">
-            <button onClick={onCancel} className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-            <div className="w-3 h-3 rounded-full bg-[#FEBC2E] opacity-40" />
-            <div className="w-3 h-3 rounded-full bg-[#28C840] opacity-40" />
-          </div>
-          <span className="flex-1 text-center text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Delete Project</span>
-          <div className="w-[52px]" />
-        </div>
-        <div className="p-5" style={{ background: 'rgba(242,237,231,0.97)' }}>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style={{ background: 'rgba(200,80,60,0.12)', border: '1px solid var(--glass-border)' }}>🗑️</div>
-              <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>Enter password to delete this project</p>
             </div>
             <input type="password" value={pw} onChange={e => { setPw(e.target.value); setErr(false) }}
               placeholder="Password" autoFocus
@@ -294,9 +198,8 @@ const PROJECT_ORDER_KEY = 'ca-project-order'
 
 function Desktop() {
   const { windows } = useWindowManager()
-  const { customProjects } = useCustomProjects()
+  const { projects: cmsProjects } = useSiteData()
   const { notes } = useNotes()
-  const [showAddModal, setShowAddModal] = useState(false)
   const [showAddNote, setShowAddNote] = useState(false)
 
   // ── Drag-to-reorder projects ──
@@ -311,17 +214,12 @@ function Desktop() {
     } catch {}
   }, [])
 
-  const allRaw = useMemo(() => [
-    ...PROJECT_APPS.map(a => ({ id: a.id, kind: 'app' as const, app: a })),
-    ...customProjects.map(p => ({ id: p.id, kind: 'custom' as const, custom: p })),
-  ], [customProjects])
-
   const orderedProjects = useMemo(() => {
-    const known = orderIds.filter(id => allRaw.some(p => p.id === id))
-    const ordered = known.map(id => allRaw.find(p => p.id === id)!).filter(Boolean)
-    const rest = allRaw.filter(p => !known.includes(p.id))
+    const known = orderIds.filter(id => cmsProjects.some(p => p.id === id))
+    const ordered = known.map(id => cmsProjects.find(p => p.id === id)!).filter(Boolean)
+    const rest = cmsProjects.filter(p => !known.includes(p.id))
     return [...ordered, ...rest]
-  }, [allRaw, orderIds])
+  }, [cmsProjects, orderIds])
 
   function saveOrder(ids: string[]) {
     setOrderIds(ids)
@@ -361,20 +259,7 @@ function Desktop() {
 
           {/* ── Projects section ── */}
           <div id="section-projects">
-            <div className="flex items-center gap-3 mb-3 px-1">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em]"
-                style={{ color: 'var(--text-muted)' }}>
-                Projects
-              </p>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold transition-all hover:scale-110 active:scale-95"
-                style={{ background: 'rgba(132,156,146,0.20)', color: 'var(--teal-dark)', border: '1px solid var(--glass-border)' }}
-                title="Add project"
-              >
-                +
-              </button>
-            </div>
+            <SectionLabel>Projects</SectionLabel>
             <div className="flex gap-4 sm:gap-6 flex-wrap">
               {orderedProjects.map(item => (
                 <div
@@ -394,10 +279,7 @@ function Desktop() {
                     cursor: 'grab',
                   }}
                 >
-                  {item.kind === 'app'
-                    ? <AppIcon app={item.app} />
-                    : <CustomAppIcon project={item.custom} />
-                  }
+                  <AppIcon app={projectToAppConfig(item)} />
                 </div>
               ))}
             </div>
@@ -449,14 +331,6 @@ function Desktop() {
         <WindowModal key={win.id} win={win} />
       ))}
 
-      {/* ── Add Project Modal ── */}
-      {showAddModal && (
-        <AddProjectModal
-          onClose={() => setShowAddModal(false)}
-          existingCount={PROJECT_APPS.length + customProjects.length}
-        />
-      )}
-
       {/* ── Add Note Modal ── */}
       {showAddNote && (
         <AddNoteModal onClose={() => setShowAddNote(false)} />
@@ -467,9 +341,9 @@ function Desktop() {
 
 export default function OSDesktop() {
   return (
+    <SiteDataProvider>
     <GalleryProvider>
     <NotesProvider>
-    <CustomProjectsProvider>
       <WindowManagerProvider>
         <div className="w-screen h-screen overflow-hidden relative">
           <TopBar />
@@ -477,8 +351,8 @@ export default function OSDesktop() {
           <Dock />
         </div>
       </WindowManagerProvider>
-    </CustomProjectsProvider>
     </NotesProvider>
     </GalleryProvider>
+    </SiteDataProvider>
   )
 }
