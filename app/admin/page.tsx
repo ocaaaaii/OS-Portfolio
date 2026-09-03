@@ -34,6 +34,66 @@ function SaveMsg({ ok }: { ok: boolean | null }) {
   </span>
 }
 
+// ── Image Upload ──────────────────────────────────────────────────
+const BUCKET = 'portfolio-images'
+
+function FileUpload({ value, onChange, label = 'Image', accept = 'image/*', isPdf = false }: {
+  value: string
+  onChange: (url: string) => void
+  label?: string
+  accept?: string
+  isPdf?: boolean
+}) {
+  const [uploading, setUploading] = useState(false)
+  const [err, setErr] = useState('')
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true); setErr('')
+    const ext = file.name.split('.').pop() ?? 'bin'
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error: upErr } = await supabase.storage.from(BUCKET).upload(filename, file, { upsert: true })
+    if (upErr) { setErr('Upload failed: ' + upErr.message); setUploading(false); return }
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(filename)
+    onChange(data.publicUrl)
+    setUploading(false)
+    e.target.value = ''
+  }
+
+  return (
+    <div>
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2 flex-wrap">
+        {value && !isPdf && (
+          <img src={value} alt="preview"
+            className="w-10 h-10 object-cover rounded-lg border border-gray-100 shrink-0 bg-gray-50"
+            onError={ev => { (ev.target as HTMLImageElement).style.display = 'none' }} />
+        )}
+        {value && isPdf && (
+          <a href={value} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1 text-[10px] text-teal-600 hover:underline shrink-0 px-2 py-1 rounded border border-gray-100 bg-gray-50">
+            📄 View PDF
+          </a>
+        )}
+        <label className={`${btn('ghost')} cursor-pointer flex items-center gap-1`}>
+          {uploading ? '⏳ Uploading…' : `↑ Upload ${isPdf ? 'PDF' : 'Image'}`}
+          <input type="file" accept={accept} className="hidden" onChange={handleFile} disabled={uploading} />
+        </label>
+        {value && !uploading && (
+          <span className="text-[10px] text-gray-400 truncate max-w-[180px]" title={value}>
+            {value.split('/').pop()}
+          </span>
+        )}
+        {err && <span className="text-xs text-red-500">{err}</span>}
+      </div>
+    </div>
+  )
+}
+// alias for image-only usage
+const ImageUpload = (props: Omit<Parameters<typeof FileUpload>[0], 'accept' | 'isPdf'>) =>
+  <FileUpload {...props} accept="image/*" />
+
 // ── Login ─────────────────────────────────────────────────────────
 function Login({ onSuccess }: { onSuccess: () => void }) {
   const [pw, setPw] = useState('')
@@ -113,7 +173,15 @@ function ProfileTab() {
           <textarea className={`${inp} h-20 resize-none`} value={form.bio}
             onChange={e => setForm(p => ({ ...p!, bio: e.target.value }))} />
         </div>
-        {f('email')}{f('phone')}{f('linkedinUrl')}{f('githubUrl')}{f('cvPath')}{f('statusText')}
+        {f('email')}{f('phone')}{f('linkedinUrl')}{f('githubUrl')}
+        <FileUpload
+          value={form.cvPath}
+          onChange={url => setForm(p => ({ ...p!, cvPath: url }))}
+          label="CV / Resume (PDF)"
+          accept=".pdf,application/pdf"
+          isPdf
+        />
+        {f('statusText')}
       </Card>
       <div className="flex items-center gap-3">
         <button onClick={save} disabled={saving} className={btn('primary')}>
@@ -287,10 +355,8 @@ function ExperienceTab() {
           <div><Label>Company</Label><input className={inp} value={f.company} onChange={e => setF(p => ({ ...p, company: e.target.value }))} /></div>
           <div><Label>Role</Label><input className={inp} value={f.role} onChange={e => setF(p => ({ ...p, role: e.target.value }))} /></div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <div><Label>Period</Label><input className={inp} value={f.period} placeholder="2026.08 – Present" onChange={e => setF(p => ({ ...p, period: e.target.value }))} /></div>
-          <div><Label>Logo path</Label><input className={inp} value={f.logoPath} placeholder="/tsmc.png" onChange={e => setF(p => ({ ...p, logoPath: e.target.value }))} /></div>
-        </div>
+        <div><Label>Period</Label><input className={inp} value={f.period} placeholder="2026.08 – Present" onChange={e => setF(p => ({ ...p, period: e.target.value }))} /></div>
+        <ImageUpload value={f.logoPath} onChange={url => setF(p => ({ ...p, logoPath: url }))} label="Company Logo" />
         <div><Label>Description</Label><textarea className={`${inp} h-14 resize-none`} value={f.description} onChange={e => setF(p => ({ ...p, description: e.target.value }))} /></div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
@@ -356,7 +422,7 @@ function ExperienceTab() {
                     <div><Label>Period</Label><input className={inp} value={eduForm.period} onChange={ev => setEduForm(p => ({ ...p, period: ev.target.value }))} /></div>
                     <div><Label>GPA</Label><input className={inp} value={eduForm.gpa} onChange={ev => setEduForm(p => ({ ...p, gpa: ev.target.value }))} /></div>
                   </div>
-                  <div><Label>Logo path</Label><input className={inp} value={eduForm.logoPath} placeholder="/NSYSU.png" onChange={ev => setEduForm(p => ({ ...p, logoPath: ev.target.value }))} /></div>
+                  <ImageUpload value={eduForm.logoPath} onChange={url => setEduForm(p => ({ ...p, logoPath: url }))} label="School Logo" />
                   <div className="flex gap-2 mt-2"><button onClick={saveEdu} className={btn('primary')}>Save</button><button onClick={() => setEditEduId(null)} className={btn('ghost')}>Cancel</button></div>
                 </div>
               ) : (
@@ -381,7 +447,7 @@ function ExperienceTab() {
                 <div><Label>Period</Label><input className={inp} value={eduForm.period} onChange={e => setEduForm(p => ({ ...p, period: e.target.value }))} /></div>
                 <div><Label>GPA</Label><input className={inp} value={eduForm.gpa} onChange={e => setEduForm(p => ({ ...p, gpa: e.target.value }))} /></div>
               </div>
-              <div><Label>Logo path</Label><input className={inp} value={eduForm.logoPath} placeholder="/NSYSU.png" onChange={e => setEduForm(p => ({ ...p, logoPath: e.target.value }))} /></div>
+              <ImageUpload value={eduForm.logoPath} onChange={url => setEduForm(p => ({ ...p, logoPath: url }))} label="School Logo" />
               <div className="flex gap-2"><button onClick={addEdu} className={btn('primary')}>Add</button><button onClick={() => setAddingEdu(false)} className={btn('ghost')}>Cancel</button></div>
             </Card>
           ) : (
@@ -435,9 +501,9 @@ function ProjectsTab() {
           <div className="col-span-2"><Label>Label</Label><input className={inp} value={f.label} onChange={e => setF(p => ({ ...p, label: e.target.value }))} /></div>
           <div><Label>Emoji</Label><input className={inp} value={f.emoji} onChange={e => setF(p => ({ ...p, emoji: e.target.value }))} /></div>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="col-span-2"><Label>Image path (public/)</Label><input className={inp} value={f.imgSrc} placeholder="/MyProject.png" onChange={e => setF(p => ({ ...p, imgSrc: e.target.value }))} /></div>
-          <div className="flex flex-col"><Label>BG color</Label><input type="color" value={f.bg} onChange={e => setF(p => ({ ...p, bg: e.target.value }))} className="h-9 flex-1 rounded border border-gray-200 cursor-pointer" /></div>
+        <div className="flex items-end gap-3">
+          <div className="flex-1"><ImageUpload value={f.imgSrc} onChange={url => setF(p => ({ ...p, imgSrc: url }))} label="Project Image" /></div>
+          <div className="shrink-0"><Label>BG color</Label><input type="color" value={f.bg} onChange={e => setF(p => ({ ...p, bg: e.target.value }))} className="h-9 w-12 rounded border border-gray-200 cursor-pointer" /></div>
         </div>
         <div><Label>iframe URL</Label><input className={inp} value={f.iframeUrl} placeholder="https://myapp.vercel.app/" onChange={e => setF(p => ({ ...p, iframeUrl: e.target.value }))} /></div>
       </div>
@@ -476,7 +542,6 @@ function ProjectsTab() {
       ) : (
         <button onClick={() => { setAdding(true); setForm({ label: '', emoji: '✦', bg: '#8AAEAB', imgSrc: '', iframeUrl: '', iconScale: 1 }) }} className={`${btn('ghost')} w-full py-2`}>+ Add Project</button>
       )}
-      <p className="text-xs text-gray-400">Note: place new images in <code>public/</code> and reference them as <code>/filename.png</code></p>
     </div>
   )
 }

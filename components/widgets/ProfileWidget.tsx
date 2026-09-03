@@ -31,7 +31,7 @@ export default function ProfileWidget() {
       gsap.from('.profile-header', { y: 10, duration: 0.5, ease: 'power3.out', delay: 0.1, clearProps: 'y' })
       gsap.from('.profile-bio',    { y: 6,  duration: 0.4, ease: 'power2.out', delay: 0.35, clearProps: 'y' })
       gsap.from('.contact-item',   { x: -10, stagger: 0.08, duration: 0.4, ease: 'power2.out', delay: 0.55, clearProps: 'x' })
-      gsap.from('.profile-btn',    { y: 8,  stagger: 0.07, duration: 0.4, ease: 'power2.out', delay: 0.8,  clearProps: 'y' })
+      // buttons appear naturally with the container's CSS fade-up
     }, containerRef)
     return () => ctx.revert()
   }, [loading, profile])
