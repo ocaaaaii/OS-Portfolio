@@ -72,28 +72,28 @@ export const SYSTEM_APPS: AppConfig[] = [
     type: 'terminal',
     label: 'Terminal',
     emoji: '>_',
-    bg: '#2D2D2D',
+    bg: '#1E3A5F',   // deep navy — structural, tech
   },
   {
     id: 'readme',
     type: 'readme',
     label: 'readme.txt',
     emoji: '.txt',
-    bg: '#C4845A',
+    bg: '#8B6A1E',   // antique amber — warm, archival
   },
   {
     id: 'contact',
     type: 'contact',
     label: 'Contact Me',
     emoji: '@',
-    bg: '#9B84C4',
+    bg: '#3D6B52',   // forest sage — calm, grounded
   },
   {
     id: 'gallery',
     type: 'gallery',
     label: 'Gallery',
     emoji: '✦',
-    bg: '#B07A6E',
+    bg: '#7A4A6B',   // dusty plum — warm contrast
   },
 ]
 
@@ -104,7 +104,7 @@ export const NOTE_SYSTEM_APPS: AppConfig[] = [
     type: 'vibecoding',
     label: 'Vibe Coding',
     emoji: 'SOP',
-    bg: '#7B6FA0',
+    bg: '#4A6B9E',   // slate cornflower — between sky & cobalt
   },
 ]
 

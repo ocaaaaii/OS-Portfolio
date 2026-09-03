@@ -58,7 +58,7 @@ export default function ProfileWidget() {
             <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{p.title}</p>
             {p.title.includes('Heph') && (
               <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                style={{ background: 'rgba(150,177,205,0.22)', color: '#6A92B5', letterSpacing: '0.04em' }}>NOW</span>
+                style={{ background: 'rgba(242,201,76,0.25)', color: '#9B7800', letterSpacing: '0.04em' }}>NOW</span>
             )}
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function ProfileWidget() {
       </div>
       <a href={p.cvPath} target="_blank" rel="noopener noreferrer"
         className="profile-btn flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold hover:opacity-85 transition-opacity w-full"
-        style={{ background: 'rgba(150,177,205,0.12)', color: 'var(--teal-dark)', border: '1px solid var(--glass-border)' }}>
+        style={{ background: 'rgba(122,166,194,0.14)', color: 'var(--teal-dark)', border: '1px solid var(--glass-border)' }}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
         </svg>

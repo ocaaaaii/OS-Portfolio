@@ -2,34 +2,34 @@
 @import "katex/dist/katex.min.css";
 
 :root {
-  /* Chambray & Blush palette */
-  --cream:          #F5F0EB;
-  --beige:          #EDE4DC;
-  --teal-light:     #EBD6D6;   /* Light Youth blush */
-  --teal:           #96B1CD;   /* Chambray Blue */
-  --teal-dark:      #8A6864;   /* Creamed Muscat */
-  --accent-rose:    #C59F9C;   /* Pepperberry */
-  --accent-terra:   #482A25;   /* Rookwood Dark Red */
-  --text-primary:   #482A25;   /* Rookwood — deepest warm brown */
-  --text-secondary: #8A6864;   /* Creamed Muscat */
-  --text-muted:     #C59F9C;   /* Pepperberry */
-  --glass-bg:       rgba(245, 240, 235, 0.76);
-  --glass-border:   rgba(197, 159, 156, 0.28);  /* Pepperberry tint */
-  --shadow-teal:    rgba(138, 104, 100, 0.12);  /* Creamed Muscat shadow */
+  /* 黃油藍調 palette */
+  --cream:          #FEFAE6;   /* 黃油奶白 45% */
+  --beige:          #F5F0D0;   /* warm butter beige */
+  --teal-light:     #B8CDD9;   /* soft sky */
+  --teal:           #7AA6C2;   /* 晴空灰藍 25% */
+  --teal-dark:      #3157A4;   /* 鈷藍 15% */
+  --accent-rose:    #F2C94C;   /* 向日金 10% */
+  --accent-terra:   #C9A000;   /* deeper gold */
+  --text-primary:   #2A2E35;   /* 鉛筆灰 5% */
+  --text-secondary: #4A5568;   /* mid blue-gray */
+  --text-muted:     #7A8A9A;   /* light blue-gray */
+  --glass-bg:       rgba(254, 250, 230, 0.82);
+  --glass-border:   rgba(122, 166, 194, 0.28);  /* sky blue tint */
+  --shadow-teal:    rgba(49,  87,  164, 0.08);  /* cobalt shadow */
 }
 
 body {
   margin: 0;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(160deg, #F5F0EB 0%, #EDE4DC 40%, #E8D6D4 72%, #D4C0BE 100%);
+  background: linear-gradient(160deg, #FEFAE6 0%, #F5F0D0 45%, #EAE8D4 72%, #DCE8F2 100%);
   min-height: 100vh;
   color: var(--text-primary);
 }
 
 ::-webkit-scrollbar       { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(197,159,156,0.40); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: rgba(122,166,194,0.45); border-radius: 99px; }
 
 .glass {
   background: var(--glass-bg);
@@ -59,4 +59,4 @@ body {
 }
 .slide-up { animation: slideUp 0.30s cubic-bezier(0.34,1.2,0.64,1) forwards; }
 
-::selection { background: rgba(150,177,205,0.30); }
+::selection { background: rgba(242,201,76,0.38); }

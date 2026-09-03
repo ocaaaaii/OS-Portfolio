@@ -11,16 +11,16 @@ export interface Note {
 }
 
 export const NOTE_COLORS = [
-  '#5A5272', // purple (default)
-  '#7B6FA0', // lavender
-  '#6A8178', // teal
-  '#849C92', // sage
-  '#B07A6E', // dusty rose
-  '#C4845A', // terracotta
-  '#9B84C4', // soft violet
-  '#7A9CAA', // slate blue
-  '#8A7060', // warm brown
-  '#5E7A6A', // forest
+  '#4A6B9E', // slate cornflower
+  '#1E3A5F', // deep navy
+  '#3D6B52', // forest sage
+  '#6B7A4A', // olive
+  '#7A4A6B', // dusty plum
+  '#8B4A4A', // muted burgundy
+  '#8B6A1E', // antique amber
+  '#5A3D2A', // warm espresso
+  '#4A7A8B', // steel teal
+  '#6B5A8B', // slate violet
 ]
 
 const ML_NOTE_CONTENT = `評估模型好壞不能只靠「體感」，需要量化指標。常見的有 **Accuracy**、**Precision**、**Recall**、**F1-score**，以及用於曲線比較的 **ROC-AUC** 與 **PR-AUC**。
