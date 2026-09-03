@@ -71,7 +71,7 @@ export default function ExperienceWidget() {
                     </p>
                     {w.isCurrent && (
                       <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
-                        style={{ background: 'rgba(99,102,241,0.15)', color: '#818CF8' }}>● NOW</span>
+                        style={{ background: 'rgba(150,177,205,0.22)', color: '#6A92B5' }}>● NOW</span>
                     )}
                   </div>
                   <p className="text-[10px]" style={{ color: 'var(--teal)' }}>{w.period}</p>

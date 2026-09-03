@@ -305,7 +305,7 @@ function Desktop() {
               <button
                 onClick={() => setShowAddNote(true)}
                 className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold transition-all hover:scale-110 active:scale-95"
-                style={{ background: 'rgba(123,111,160,0.20)', color: '#7B6FA0', border: '1px solid var(--glass-border)' }}
+                style={{ background: 'rgba(197,159,156,0.20)', color: 'var(--teal-dark)', border: '1px solid var(--glass-border)' }}
                 title="Add note"
               >
                 +

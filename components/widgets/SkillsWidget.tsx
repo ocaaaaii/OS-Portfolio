@@ -38,11 +38,11 @@ export default function SkillsWidget() {
           </p>
           <div className="flex flex-wrap gap-1.5">
             {group.skills.map(s => (
-              <span key={s} className="skill-tag text-[10px] px-2 py-0.5 rounded-full font-medium transition-transform hover:scale-105"
+              <span key={s} className="skill-tag text-[10px] px-2 py-0.5 rounded-full font-medium"
                 style={{
-                  background: `${group.color}18`,
-                  border: `1px solid ${group.color}40`,
-                  color: group.color,
+                  background: 'rgba(150,177,205,0.12)',
+                  border: '1px solid var(--glass-border)',
+                  color: 'var(--text-secondary)',
                 }}>
                 {s}
               </span>
