@@ -35,18 +35,18 @@ export default function TopBar() {
     <div
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 py-2"
       style={{
-        background: 'rgba(226,213,197,0.80)',
+        background: 'rgba(42,46,53,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(106,152,150,0.20)',
+        borderBottom: '1px solid rgba(184,205,217,0.12)',
       }}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--teal-dark)' }}>
+        <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#FEFAE6' }}>
           CA&apos;s OS
         </span>
         <span className="text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: 'rgba(106,152,150,0.20)', color: 'var(--teal)' }}>
+          style={{ background: 'rgba(184,205,217,0.15)', color: '#B8CDD9' }}>
           v1.0.0
         </span>
       </div>
@@ -56,12 +56,12 @@ export default function TopBar() {
           <button
             key={label}
             onClick={action}
-            className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 rounded-lg transition-all hover:opacity-100 opacity-70"
+            className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 rounded-lg transition-all hover:opacity-100 opacity-60"
             style={{
-              color: 'var(--text-secondary)',
+              color: '#FEFAE6',
               background: 'transparent',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(132,156,146,0.15)')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(184,205,217,0.15)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             {label}
@@ -69,7 +69,7 @@ export default function TopBar() {
         ))}
       </div>
 
-      <span className="text-xs font-semibold tabular-nums" style={{ color: 'var(--text-secondary)' }}>
+      <span className="text-xs font-semibold tabular-nums" style={{ color: '#B8CDD9' }}>
         {time}
       </span>
     </div>
