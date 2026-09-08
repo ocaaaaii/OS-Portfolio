@@ -65,6 +65,34 @@ function parseMarkdown(md: string): ReactNode[] {
       i++; continue
     }
 
+    // Fenced code block: ```[lang]\n...\n```
+    if (trimmed.startsWith('```')) {
+      const lang = trimmed.slice(3).trim()
+      i++
+      const codeLines: string[] = []
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        codeLines.push(lines[i])
+        i++
+      }
+      if (i < lines.length) i++ // skip closing ```
+      blocks.push(
+        <div key={key++} className="my-3 rounded-xl overflow-x-auto"
+          style={{ background: 'rgba(42,46,53,0.88)', border: '1px solid rgba(184,205,217,0.15)' }}>
+          {lang && (
+            <div className="px-4 pt-2.5 pb-1 text-[10px] font-mono tracking-widest uppercase"
+              style={{ color: 'rgba(184,205,217,0.55)', borderBottom: '1px solid rgba(184,205,217,0.10)' }}>
+              {lang}
+            </div>
+          )}
+          <pre className="px-4 py-3 text-[12px] font-mono leading-relaxed overflow-x-auto whitespace-pre"
+            style={{ color: '#FEFAE6', margin: 0 }}>
+            <code>{codeLines.join('\n')}</code>
+          </pre>
+        </div>
+      )
+      continue
+    }
+
     // Math block: $$...$$  (single-line OR multi-line)
     if (trimmed.startsWith('$$')) {
       let formula = ''
@@ -216,7 +244,7 @@ function parseMarkdown(md: string): ReactNode[] {
     while (
       i < lines.length &&
       lines[i].trim() !== '' &&
-      !/^[-*+]\s|^\d+\.\s|^>|^\||^#{1,3}\s|^-{3,}$|\*{3,}$|^\$\$/.test(lines[i].trim())
+      !/^[-*+]\s|^\d+\.\s|^>|^\||^#{1,3}\s|^-{3,}$|\*{3,}$|^\$\$|^```/.test(lines[i].trim())
     ) {
       paraLines.push(lines[i].trim())
       i++
