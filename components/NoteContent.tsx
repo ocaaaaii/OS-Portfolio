@@ -24,25 +24,150 @@ function renderMath(formula: string, display: boolean): ReactNode {
 // ── Inline formatter ─────────────────────────────────────────────────────────
 function renderInline(text: string): ReactNode {
   const parts: ReactNode[] = []
-  // Patterns: **bold** | *italic* | `code` | ==highlight== | ~~strike~~ | $math$
-  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`|==(.+?)==|~~(.+?)~~|\$([^$\n]+?)\$/g
+  // Order matters: images before links; bold before italic
+  const re = /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`|==(.+?)==|~~(.+?)~~|\$([^$\n]+?)\$/g
   let last = 0
   let m: RegExpExecArray | null
   let i = 0
 
   while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(<Fragment key={i++}>{text.slice(last, m.index)}</Fragment>)
-    if (m[1]) parts.push(<strong key={i++} style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{m[1]}</strong>)
-    else if (m[2]) parts.push(<em key={i++}>{m[2]}</em>)
-    else if (m[3]) parts.push(<code key={i++} className="px-1.5 py-0.5 rounded text-[11px] font-mono"
-      style={{ background: 'rgba(132,156,146,0.18)', color: 'var(--teal-dark)' }}>{m[3]}</code>)
-    else if (m[4]) parts.push(<mark key={i++} style={{ background: 'rgba(196,132,90,0.22)', padding: '0 2px', borderRadius: 3, color: 'var(--text-primary)' }}>{m[4]}</mark>)
-    else if (m[5]) parts.push(<s key={i++} style={{ opacity: 0.5 }}>{m[5]}</s>)
-    else if (m[6]) parts.push(<Fragment key={i++}>{renderMath(m[6], false)}</Fragment>)
+
+    if (m[1] !== undefined) {
+      // Image inline: ![alt](url)
+      // eslint-disable-next-line @next/next/no-img-element
+      parts.push(<img key={i++} src={m[2]} alt={m[1]} className="inline max-h-24 rounded align-middle" />)
+    } else if (m[3] !== undefined) {
+      // Link: [text](url)
+      parts.push(
+        <a key={i++} href={m[4]} target="_blank" rel="noopener noreferrer"
+          className="underline hover:opacity-75 transition-opacity"
+          style={{ color: 'var(--teal)' }}>
+          {m[3]}
+        </a>
+      )
+    } else if (m[5]) {
+      parts.push(<strong key={i++} style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{m[5]}</strong>)
+    } else if (m[6]) {
+      parts.push(<em key={i++} style={{ fontStyle: 'italic' }}>{m[6]}</em>)
+    } else if (m[7]) {
+      parts.push(
+        <code key={i++} className="px-1.5 py-0.5 rounded text-[11px] font-mono"
+          style={{ background: 'rgba(132,156,146,0.18)', color: 'var(--teal-dark)' }}>
+          {m[7]}
+        </code>
+      )
+    } else if (m[8]) {
+      parts.push(
+        <mark key={i++} style={{ background: 'rgba(196,132,90,0.22)', padding: '0 2px', borderRadius: 3, color: 'var(--text-primary)' }}>
+          {m[8]}
+        </mark>
+      )
+    } else if (m[9]) {
+      parts.push(<s key={i++} style={{ opacity: 0.5 }}>{m[9]}</s>)
+    } else if (m[10]) {
+      parts.push(<Fragment key={i++}>{renderMath(m[10], false)}</Fragment>)
+    }
     last = m.index + m[0].length
   }
   if (last < text.length) parts.push(<Fragment key={i++}>{text.slice(last)}</Fragment>)
   return parts.length === 0 ? text : <>{parts}</>
+}
+
+// ── List helpers ──────────────────────────────────────────────────────────────
+interface RawItem {
+  text: string
+  indent: number
+  checked: boolean | null
+  ordered: boolean
+}
+
+function collectList(lines: string[], start: number): { items: RawItem[]; end: number } {
+  const items: RawItem[] = []
+  let i = start
+  while (i < lines.length) {
+    const line = lines[i]
+    const indentLen = line.match(/^(\s*)/)?.[1].length ?? 0
+    const trimmed = line.trim()
+    const isUnordered = /^[-*+]\s/.test(trimmed)
+    const isOrdered   = /^\d+\.\s/.test(trimmed)
+    if (!isUnordered && !isOrdered) break
+
+    let text = isUnordered
+      ? trimmed.replace(/^[-*+]\s/, '')
+      : trimmed.replace(/^\d+\.\s/, '')
+    let checked: boolean | null = null
+    if (/^\[ \]\s/.test(text))     { checked = false; text = text.slice(4) }
+    else if (/^\[x\]\s/i.test(text)) { checked = true;  text = text.slice(4) }
+
+    items.push({ text, indent: indentLen, checked, ordered: isOrdered })
+    i++
+  }
+  return { items, end: i }
+}
+
+function renderNestedList(items: RawItem[], baseIndent: number, keyRef: { n: number }): ReactNode {
+  const result: ReactNode[] = []
+  let i = 0
+  while (i < items.length) {
+    const item = items[i]
+    if (item.indent < baseIndent) break
+    if (item.indent > baseIndent) { i++; continue }
+
+    // Collect children (deeper indent)
+    const children: RawItem[] = []
+    let j = i + 1
+    while (j < items.length && items[j].indent > baseIndent) {
+      children.push(items[j])
+      j++
+    }
+
+    const childNode = children.length > 0
+      ? <ul className="mt-1 space-y-0.5" style={{ paddingLeft: '16px' }}>
+          {renderNestedList(children, children[0].indent, keyRef)}
+        </ul>
+      : null
+
+    const k = keyRef.n++
+
+    if (item.checked !== null) {
+      // Task list item
+      result.push(
+        <li key={k} style={{ listStyle: 'none' }} className="flex items-start gap-2 text-sm leading-relaxed">
+          <span className="mt-0.5 shrink-0 w-3.5 h-3.5 rounded border flex items-center justify-center"
+            style={{
+              borderColor: item.checked ? 'var(--teal)' : 'var(--glass-border)',
+              background:  item.checked ? 'rgba(122,166,194,0.2)' : 'transparent',
+            }}>
+            {item.checked && (
+              <svg width="9" height="9" viewBox="0 0 12 12">
+                <polyline points="2,6 5,9 10,3" fill="none" stroke="var(--teal)"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </span>
+          <span style={{
+            color: 'var(--text-secondary)',
+            textDecoration: item.checked ? 'line-through' : 'none',
+            opacity: item.checked ? 0.5 : 1,
+          }}>
+            {renderInline(item.text)}
+          </span>
+          {childNode}
+        </li>
+      )
+    } else {
+      result.push(
+        <li key={k} className="text-sm leading-relaxed"
+          style={{ color: 'var(--text-secondary)', display: 'list-item' }}>
+          {renderInline(item.text)}
+          {childNode}
+        </li>
+      )
+    }
+    i = j
+  }
+  return <>{result}</>
 }
 
 // ── Block parser ──────────────────────────────────────────────────────────────
@@ -56,16 +181,16 @@ function parseMarkdown(md: string): ReactNode[] {
     const line = lines[i]
     const trimmed = line.trim()
 
-    // Empty line
+    // ── Empty line
     if (trimmed === '') { i++; continue }
 
-    // Horizontal rule
+    // ── Horizontal rule
     if (/^-{3,}$/.test(trimmed) || /^\*{3,}$/.test(trimmed)) {
       blocks.push(<hr key={key++} style={{ border: 'none', borderTop: '1px solid var(--glass-border)', margin: '16px 0' }} />)
       i++; continue
     }
 
-    // Fenced code block: ```[lang]\n...\n```
+    // ── Fenced code block: ```[lang]
     if (trimmed.startsWith('```')) {
       const lang = trimmed.slice(3).trim()
       i++
@@ -76,7 +201,7 @@ function parseMarkdown(md: string): ReactNode[] {
       }
       if (i < lines.length) i++ // skip closing ```
       blocks.push(
-        <div key={key++} className="my-3 rounded-xl overflow-x-auto"
+        <div key={key++} className="my-3 rounded-xl overflow-hidden"
           style={{ background: 'rgba(42,46,53,0.88)', border: '1px solid rgba(184,205,217,0.15)' }}>
           {lang && (
             <div className="px-4 pt-2.5 pb-1 text-[10px] font-mono tracking-widest uppercase"
@@ -93,22 +218,17 @@ function parseMarkdown(md: string): ReactNode[] {
       continue
     }
 
-    // Math block: $$...$$  (single-line OR multi-line)
+    // ── Math block: $$
     if (trimmed.startsWith('$$')) {
       let formula = ''
       if (trimmed.endsWith('$$') && trimmed.length > 4) {
-        // Single-line: $$formula$$
         formula = trimmed.slice(2, -2).trim()
         i++
       } else {
-        // Multi-line: opening $$ on its own line
         i++
         const fLines: string[] = []
-        while (i < lines.length && lines[i].trim() !== '$$') {
-          fLines.push(lines[i])
-          i++
-        }
-        if (i < lines.length) i++ // skip closing $$
+        while (i < lines.length && lines[i].trim() !== '$$') { fLines.push(lines[i]); i++ }
+        if (i < lines.length) i++
         formula = fLines.join('\n').trim()
       }
       blocks.push(
@@ -120,30 +240,51 @@ function parseMarkdown(md: string): ReactNode[] {
       continue
     }
 
-    // Blockquote: > ...
-    if (trimmed.startsWith('> ')) {
+    // ── Standalone image: ![alt](url) on its own line
+    const imgMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)
+    if (imgMatch) {
+      blocks.push(
+        <div key={key++} className="my-3 flex justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imgMatch[2]} alt={imgMatch[1]}
+            className="max-w-full rounded-xl shadow-md"
+            style={{ maxHeight: '320px', objectFit: 'contain' }} />
+        </div>
+      )
+      i++; continue
+    }
+
+    // ── Blockquote (supports >> nested)
+    if (trimmed.startsWith('>')) {
       const bqLines: string[] = []
-      while (i < lines.length && lines[i].trim().startsWith('> ')) {
-        bqLines.push(lines[i].trim().slice(2))
+      while (i < lines.length && lines[i].trim().startsWith('>')) {
+        bqLines.push(lines[i].trim())
         i++
       }
+      const innerLines = bqLines.map(l => l.replace(/^>\s?/, ''))
+      const hasNested = innerLines.some(l => l.startsWith('>'))
       blocks.push(
-        <blockquote key={key++} className="my-3 px-4 py-2 rounded-r-lg text-sm"
-          style={{ borderLeft: '3px solid var(--teal)', background: 'rgba(132,156,146,0.10)', color: 'var(--text-secondary)', margin: '12px 0' }}>
-          {bqLines.map((l, j) => <p key={j} className="leading-relaxed">{renderInline(l)}</p>)}
+        <blockquote key={key++} className="my-3 px-4 py-2 rounded-r-lg"
+          style={{ borderLeft: '3px solid var(--teal)', background: 'rgba(132,156,146,0.10)', margin: '12px 0' }}>
+          {hasNested
+            ? parseMarkdown(innerLines.join('\n'))
+            : innerLines.map((l, j) => (
+                <p key={j} className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                  {renderInline(l)}
+                </p>
+              ))}
         </blockquote>
       )
       continue
     }
 
-    // Table: starts with |
+    // ── Table
     if (trimmed.startsWith('|')) {
       const tableLines: string[] = []
       while (i < lines.length && lines[i].trim().startsWith('|')) {
         tableLines.push(lines[i].trim())
         i++
       }
-      // Filter out separator rows (| --- | --- |)
       const dataRows = tableLines.filter(l => !/^\|[\s\-|:]+\|$/.test(l))
       if (dataRows.length > 0) {
         const parseCells = (row: string) =>
@@ -156,7 +297,8 @@ function parseMarkdown(md: string): ReactNode[] {
               <thead>
                 <tr style={{ background: 'rgba(132,156,146,0.15)' }}>
                   {headers.map((h, j) => (
-                    <th key={j} className="px-3 py-2 text-left font-semibold" style={{ color: 'var(--teal-dark)', borderBottom: '1px solid var(--glass-border)' }}>
+                    <th key={j} className="px-3 py-2 text-left font-semibold"
+                      style={{ color: 'var(--teal-dark)', borderBottom: '1px solid var(--glass-border)' }}>
                       {renderInline(h)}
                     </th>
                   ))}
@@ -180,84 +322,87 @@ function parseMarkdown(md: string): ReactNode[] {
       continue
     }
 
-    // Bullet list
-    if (/^[-*+]\s/.test(trimmed)) {
-      const items: string[] = []
-      while (i < lines.length && /^[-*+]\s/.test(lines[i].trim())) {
-        items.push(lines[i].trim().replace(/^[-*+]\s/, ''))
-        i++
-      }
+    // ── Lists (bullet / ordered / task, with nesting)
+    if (/^[-*+]\s/.test(trimmed) || /^\d+\.\s/.test(trimmed)) {
+      const { items, end } = collectList(lines, i)
+      i = end
+      const hasTasks  = items.some(it => it.checked !== null)
+      const isOrdered = (items[0]?.ordered ?? false) && !hasTasks
+      const baseIndent = items[0]?.indent ?? 0
+      const keyRef = { n: key }
+      key += items.length * 3 + 5
+
+      const ListTag = isOrdered ? 'ol' : 'ul'
       blocks.push(
-        <ul key={key++} className="my-2 space-y-1" style={{ paddingLeft: '20px' }}>
-          {items.map((item, j) => (
-            <li key={j} className="text-sm leading-relaxed list-disc" style={{ color: 'var(--text-secondary)' }}>
-              {renderInline(item)}
-            </li>
-          ))}
-        </ul>
+        <ListTag key={keyRef.n} className="my-2 space-y-1"
+          style={{ paddingLeft: hasTasks ? '0' : '20px', listStyleType: isOrdered ? 'decimal' : 'disc' }}>
+          {renderNestedList(items, baseIndent, keyRef)}
+        </ListTag>
       )
       continue
     }
 
-    // Ordered list
-    if (/^\d+\.\s/.test(trimmed)) {
-      const items: string[] = []
-      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
-        items.push(lines[i].trim().replace(/^\d+\.\s/, ''))
-        i++
-      }
+    // ── Headings (h4 → h1, most-specific first)
+    if (trimmed.startsWith('#### ')) {
       blocks.push(
-        <ol key={key++} className="my-2 space-y-1" style={{ paddingLeft: '20px' }}>
-          {items.map((item, j) => (
-            <li key={j} className="text-sm leading-relaxed list-decimal" style={{ color: 'var(--text-secondary)' }}>
-              {renderInline(item)}
-            </li>
-          ))}
-        </ol>
+        <h4 key={key++} className="text-xs font-bold mt-3 mb-1 uppercase tracking-wider"
+          style={{ color: 'var(--teal)' }}>
+          {renderInline(trimmed.slice(5))}
+        </h4>
       )
-      continue
-    }
-
-    // Headers
-    if (trimmed.startsWith('# ') && !trimmed.startsWith('## ')) {
-      blocks.push(<h1 key={key++} className="text-lg font-bold mt-2 mb-3 pb-2"
-        style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--glass-border)' }}>
-        {renderInline(trimmed.slice(2))}
-      </h1>)
-      i++; continue
-    }
-    if (trimmed.startsWith('## ') && !trimmed.startsWith('### ')) {
-      blocks.push(<h2 key={key++} className="text-base font-bold mt-5 mb-2" style={{ color: 'var(--text-primary)' }}>
-        {renderInline(trimmed.slice(3))}
-      </h2>)
       i++; continue
     }
     if (trimmed.startsWith('### ')) {
-      blocks.push(<h3 key={key++} className="text-sm font-bold mt-4 mb-1.5" style={{ color: 'var(--teal-dark)' }}>
-        {renderInline(trimmed.slice(4))}
-      </h3>)
+      blocks.push(
+        <h3 key={key++} className="text-sm font-bold mt-4 mb-1.5" style={{ color: 'var(--teal-dark)' }}>
+          {renderInline(trimmed.slice(4))}
+        </h3>
+      )
+      i++; continue
+    }
+    if (trimmed.startsWith('## ')) {
+      blocks.push(
+        <h2 key={key++} className="text-base font-bold mt-5 mb-2" style={{ color: 'var(--text-primary)' }}>
+          {renderInline(trimmed.slice(3))}
+        </h2>
+      )
+      i++; continue
+    }
+    if (trimmed.startsWith('# ')) {
+      blocks.push(
+        <h1 key={key++} className="text-lg font-bold mt-2 mb-3 pb-2"
+          style={{ color: 'var(--text-primary)', borderBottom: '1px solid var(--glass-border)' }}>
+          {renderInline(trimmed.slice(2))}
+        </h1>
+      )
       i++; continue
     }
 
-    // Paragraph — collect until empty line or block marker
+    // ── Paragraph (supports trailing double-space hard line break)
     const paraLines: string[] = []
     while (
       i < lines.length &&
       lines[i].trim() !== '' &&
-      !/^[-*+]\s|^\d+\.\s|^>|^\||^#{1,3}\s|^-{3,}$|\*{3,}$|^\$\$|^```/.test(lines[i].trim())
+      !/^[-*+]\s|^\d+\.\s|^>|^\||^#{1,6}\s|^-{3,}$|\*{3,}$|^\$\$|^```|^!\[/.test(lines[i].trim())
     ) {
-      paraLines.push(lines[i].trim())
+      paraLines.push(lines[i])
       i++
     }
     if (paraLines.length > 0) {
+      const children: ReactNode[] = []
+      paraLines.forEach((pl, pi) => {
+        const hardBreak = pl.endsWith('  ')
+        children.push(<Fragment key={pi}>{renderInline(pl.trimEnd())}</Fragment>)
+        if (hardBreak && pi < paraLines.length - 1) children.push(<br key={`br-${pi}`} />)
+        else if (pi < paraLines.length - 1) children.push(' ')
+      })
       blocks.push(
         <p key={key++} className="text-sm leading-relaxed my-2" style={{ color: 'var(--text-secondary)' }}>
-          {renderInline(paraLines.join(' '))}
+          {children}
         </p>
       )
     } else {
-      // Safety: if nothing matched and nothing consumed, skip the line to avoid infinite loop
-      i++
+      i++ // safety: skip unmatched line
     }
   }
 
@@ -291,7 +436,7 @@ export default function NoteContent({ noteId }: { noteId: string }) {
       <div className="flex-1 overflow-y-auto px-6 py-4"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(132,156,146,0.3) transparent' }}>
         {parseMarkdown(note.content)}
-        <div className="h-8" /> {/* bottom padding */}
+        <div className="h-8" />
       </div>
     </div>
   )
