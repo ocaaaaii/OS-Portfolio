@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useNotes, NOTE_COLORS } from '@/contexts/NotesContext'
+import { useNotes, NOTE_COLORS, NoteCategory } from '@/contexts/NotesContext'
 
 async function hashInput(input: string): Promise<string> {
   const encoded = new TextEncoder().encode(input)
@@ -18,6 +18,7 @@ export default function AddNoteModal({ onClose }: Props) {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [color, setColor] = useState(NOTE_COLORS[0])
+  const [category, setCategory] = useState<NoteCategory>('work')
 
   async function handlePw(e: React.FormEvent) {
     e.preventDefault()
@@ -30,7 +31,7 @@ export default function AddNoteModal({ onClose }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim() || !content.trim()) return
-    addNote(title.trim(), content.trim(), color)
+    addNote(title.trim(), content.trim(), color, category)
     onClose()
   }
 
@@ -75,6 +76,32 @@ export default function AddNoteModal({ onClose }: Props) {
             </form>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Category */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                  分類
+                </label>
+                <div className="flex gap-2">
+                  {([
+                    { value: 'work', label: '💼 工作知識', desc: 'Work & Learning' },
+                    { value: 'life', label: '✨ 生活小啟發', desc: 'Life & Inspiration' },
+                  ] as { value: NoteCategory; label: string; desc: string }[]).map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setCategory(opt.value)}
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all"
+                      style={{
+                        background: category === opt.value ? 'var(--teal-dark)' : 'rgba(132,156,146,0.10)',
+                        color: category === opt.value ? '#fff' : 'var(--text-secondary)',
+                        border: `1px solid ${category === opt.value ? 'var(--teal-dark)' : 'var(--glass-border)'}`,
+                      }}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Color picker */}
               <div className="space-y-1">
                 <label className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>

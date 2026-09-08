@@ -2,11 +2,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase'
 
+export type NoteCategory = 'work' | 'life'
+
 export interface Note {
   id: string
   title: string
   content: string   // markdown
   color: string     // icon background color
+  category: NoteCategory
   createdAt: number
 }
 
@@ -123,6 +126,7 @@ const INITIAL_NOTE: Note = {
   title: 'ML 模型評估指標：Accuracy、Precision、Recall、F1 與 AUC',
   content: ML_NOTE_CONTENT,
   color: NOTE_COLORS[0],
+  category: 'work',
   createdAt: 1700000000000, // fixed timestamp so seed is idempotent
 }
 
@@ -133,13 +137,14 @@ function rowToNote(row: Record<string, unknown>): Note {
     title:     row.title     as string,
     content:   row.content   as string,
     color:     row.color     as string,
+    category:  (row.category as NoteCategory) ?? 'work',
     createdAt: row.created_at as number,
   }
 }
 
 interface CtxValue {
   notes: Note[]
-  addNote: (title: string, content: string, color?: string) => void
+  addNote: (title: string, content: string, color?: string, category?: NoteCategory) => void
   removeNote: (id: string) => void
   updateNoteColor: (id: string, color: string) => void
   getNote: (id: string) => Note | undefined
@@ -201,15 +206,15 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     sync()
   }, [])
 
-  function addNote(title: string, content: string, color = NOTE_COLORS[0]) {
-    const note: Note = { id: `note-${Date.now()}`, title, content, color, createdAt: Date.now() }
+  function addNote(title: string, content: string, color = NOTE_COLORS[0], category: NoteCategory = 'work') {
+    const note: Note = { id: `note-${Date.now()}`, title, content, color, category, createdAt: Date.now() }
     setNotes(prev => {
       const next = [note, ...prev]
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch {}
       return next
     })
     supabase.from('notes').insert({
-      id: note.id, title, content, color, created_at: note.createdAt,
+      id: note.id, title, content, color, category, created_at: note.createdAt,
     }).then(({ error }) => { if (error) console.error('addNote failed:', error.message) })
   }
 

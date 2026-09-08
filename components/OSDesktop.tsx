@@ -296,30 +296,48 @@ function Desktop() {
           </div>
 
           {/* ── Note section ── */}
-          <div>
-            <div className="flex items-center gap-3 mb-3 px-1">
+          <div className="space-y-4">
+            {/* Section header */}
+            <div className="flex items-center gap-3 px-1">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em]"
-                style={{ color: 'var(--text-muted)' }}>
-                Note
-              </p>
+                style={{ color: 'var(--text-muted)' }}>Note</p>
               <button
                 onClick={() => setShowAddNote(true)}
                 className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold transition-all hover:scale-110 active:scale-95"
                 style={{ background: 'rgba(197,159,156,0.20)', color: 'var(--teal-dark)', border: '1px solid var(--glass-border)' }}
-                title="Add note"
-              >
+                title="Add note">
                 +
               </button>
             </div>
-            <div className="flex gap-4 sm:gap-6 flex-wrap">
-              {/* Vibe Coding SOP moved here */}
-              {NOTE_SYSTEM_APPS.map(app => (
-                <AppIcon key={app.id} app={app} />
-              ))}
-              {/* User notes */}
-              {notes.map(note => (
-                <NoteIcon key={note.id} note={note} />
-              ))}
+
+            {/* 💼 工作知識 */}
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] mb-2 px-1"
+                style={{ color: 'var(--teal)' }}>💼 工作知識</p>
+              <div className="flex gap-4 sm:gap-6 flex-wrap">
+                {NOTE_SYSTEM_APPS.map(app => (
+                  <AppIcon key={app.id} app={app} />
+                ))}
+                {notes.filter(n => n.category === 'work').map(note => (
+                  <NoteIcon key={note.id} note={note} />
+                ))}
+              </div>
+            </div>
+
+            {/* ✨ 生活小啟發 */}
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.14em] mb-2 px-1"
+                style={{ color: 'var(--accent-rose)' }}>✨ 生活小啟發</p>
+              <div className="flex gap-4 sm:gap-6 flex-wrap min-h-[60px]">
+                {notes.filter(n => n.category === 'life').map(note => (
+                  <NoteIcon key={note.id} note={note} />
+                ))}
+                {notes.filter(n => n.category === 'life').length === 0 && (
+                  <p className="text-[10px] self-center" style={{ color: 'var(--text-muted)' }}>
+                    還沒有筆記，按 + 新增一則 ✦
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
