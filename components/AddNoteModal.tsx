@@ -83,7 +83,7 @@ export default function AddNoteModal({ onClose }: Props) {
                 </label>
                 <div className="flex gap-2">
                   {([
-                    { value: 'work', label: '💼 工作知識', desc: 'Work & Learning' },
+                    { value: 'work', label: '📚 學習筆記', desc: 'Work & Learning' },
                     { value: 'life', label: '✨ 生活小啟發', desc: 'Life & Inspiration' },
                   ] as { value: NoteCategory; label: string; desc: string }[]).map(opt => (
                     <button

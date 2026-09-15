@@ -310,10 +310,10 @@ function Desktop() {
               </button>
             </div>
 
-            {/* 💼 工作知識 */}
+            {/* 📚 學習筆記 */}
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-[0.14em] mb-2 px-1"
-                style={{ color: 'var(--teal)' }}>💼 工作知識</p>
+                style={{ color: 'var(--teal)' }}>📚 學習筆記</p>
               <div className="flex gap-4 sm:gap-6 flex-wrap">
                 {NOTE_SYSTEM_APPS.map(app => (
                   <AppIcon key={app.id} app={app} />
